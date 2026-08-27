@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ICEBERG — Sell size. Make no waves.</title>
+<meta name="description" content="A sealed batch-auction venue for large orders in illiquid Solana tokens. Hidden orders, one fair clearing price, nothing leaks.">
+<style>
+  :root{
+    --deep:#060b14; --water:#0a1524; --surface:#0f1f33;
+    --ice:#dff1fb; --ice-dim:#9db8cc; --ice-faint:#5f7891;
+    --glow:#4dc3ff; --glow-deep:#1a7fc4; --hairline:rgba(160,200,235,.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--deep);color:var(--ice);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:10;background:rgba(6,11,20,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--hairline)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:980px;margin:0 auto}
+  .mark{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:15px}
+  .navlinks{display:flex;gap:26px;font-size:13.5px;color:var(--ice-dim)}
+  .navlinks a{text-decoration:none;transition:color .2s}
+  .navlinks a:hover{color:var(--ice)}
+  @media(max-width:640px){.navlinks{display:none}}
+
+  /* hero */
+  .hero{position:relative;padding:96px 0 0;text-align:center;overflow:hidden}
+  .chip{display:inline-block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--glow);border:1px solid rgba(77,195,255,.35);border-radius:999px;padding:6px 14px;margin-bottom:28px}
+  h1{font-size:clamp(2.4rem,6.5vw,4.2rem);line-height:1.06;letter-spacing:-.03em;font-weight:800}
+  h1 .dim{color:var(--ice-faint)}
+  .sub{max-width:560px;margin:22px auto 0;color:var(--ice-dim);font-size:clamp(1rem,2.2vw,1.15rem)}
+  .cta-row{margin:36px 0 0;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:13px 28px;border-radius:999px;font-weight:700;font-size:15px;text-decoration:none;transition:transform .15s,box-shadow .15s}
+  .btn-primary{background:linear-gradient(180deg,#5fcbff,#2a93d5);color:#04121f;box-shadow:0 8px 30px rgba(77,195,255,.25)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 36px rgba(77,195,255,.35)}
+  .btn-ghost{border:1px solid var(--hairline);color:var(--ice-dim)}
+  .btn-ghost:hover{color:var(--ice);border-color:rgba(160,200,235,.3)}
+
+  /* iceberg visual */
+  .berg{display:block;width:min(680px,92%);margin:56px auto -6px}
+  .waterline-label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ice-faint)}
+
+  /* sections */
+  section{padding:88px 0;border-top:1px solid var(--hairline)}
+  .kicker{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--glow);margin-bottom:14px}
+  h2{font-size:clamp(1.6rem,4vw,2.3rem);letter-spacing:-.02em;line-height:1.15;font-weight:800;max-width:620px}
+  .lead{color:var(--ice-dim);max-width:600px;margin-top:16px}
+
+  /* problem rows */
+  .rows{margin-top:44px;display:flex;flex-direction:column}
+  .row{display:grid;grid-template-columns:64px 1fr;gap:20px;padding:26px 0;border-top:1px solid var(--hairline);align-items:start}
+  .row:first-child{border-top:none}
+  .row .n{font-size:26px;font-weight:800;color:var(--glow-deep);line-height:1.1}
+  .row h3{font-size:17px;margin-bottom:6px}
+  .row p{color:var(--ice-dim);font-size:14.5px;max-width:560px}
+
+  /* how it works — depth steps */
+  .depth{margin-top:48px;position:relative}
+  .step{position:relative;margin-left:26px;padding:0 0 44px 34px;border-left:2px solid rgba(77,195,255,.25)}
+  .step:last-child{padding-bottom:0;border-left-color:transparent}
+  .step::before{content:"";position:absolute;left:-9px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--water);border:2px solid var(--glow)}
+  .step h3{font-size:18px;margin-bottom:6px}
+  .step p{color:var(--ice-dim);font-size:15px;max-width:560px}
+  .step .tag{display:inline-block;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ice-faint);margin-bottom:6px}
+
+  /* fairness band */
+  .fair{margin-top:56px;background:linear-gradient(180deg,var(--surface),var(--water));border:1px solid var(--hairline);border-radius:20px;padding:34px 34px 26px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+  .fair h3{font-size:16px;letter-spacing:.02em;margin-bottom:18px;color:var(--glow)}
+  .fair ul{list-style:none}
+  .fair li{padding:10px 0;border-top:1px solid var(--hairline);color:var(--ice-dim);font-size:14.5px;display:flex;gap:12px}
+  .fair li:first-child{border-top:none}
+  .fair li b{color:var(--ice);font-weight:650}
+  .fair .ic{color:var(--glow);flex:0 0 auto}
+
+  /* who */
+  .who{margin-top:44px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px}
+  @media(max-width:760px){.who{grid-template-columns:1fr}}
+  .who .card{background:var(--water);border:1px solid var(--hairline);border-radius:18px;padding:26px}
+  .who .card.primary{background:linear-gradient(160deg,#0e2138,#0a1524);box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  .who h3{font-size:16px;margin-bottom:8px}
+  .who p{color:var(--ice-dim);font-size:14px}
+  .who .em{font-size:22px;margin-bottom:12px;display:block}
+
+  /* footer */
+  footer{border-top:1px solid var(--hairline);padding:46px 0 60px;color:var(--ice-faint);font-size:13px}
+  .foot-in{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center}
+  footer a{color:var(--ice-dim);text-decoration:none}
+  footer a:hover{color:var(--ice)}
+  .honest{margin-top:14px;max-width:640px;line-height:1.6}
+</style>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='u' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%234dc3ff'/%3E%3Cstop offset='1' stop-color='%231a5f8e' stop-opacity='.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='5' fill='%23060b14'/%3E%3Cpolygon points='12,3 16.5,9.5 14,9.5 18.5,14.8 12,14.8' fill='%23bcd9ec'/%3E%3Cpolygon points='12,3 7.5,9.5 10,9.5 5.5,14.8 12,14.8' fill='%23ffffff'/%3E%3Cpolygon points='6.5,15.4 17.5,15.4 15,20.8 9,20.8' fill='url(%23u)'/%3E%3C/svg%3E">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="bergU" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4dc3ff"/><stop offset="1" stop-color="#1a5f8e" stop-opacity=".25"/></linearGradient>
+<filter id="bergS" x="-50%" y="-50%" width="200%" height="200%">
+<feDropShadow dx="0" dy="1.1" stdDeviation="1.1" flood-color="#04121f" flood-opacity="0.6"/>
+<feDropShadow dx="0" dy="0" stdDeviation="2.4" flood-color="#4dc3ff" flood-opacity="0.4"/>
+</filter></defs></svg>
+
+<nav><div class="nav-in">
+  <div class="mark">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <g filter="url(#bergS)"><polygon points="12,2 17,9 14,9 19,15 12,15" fill="#bcd9ec"/><polygon points="12,2 7,9 10,9 5,15 12,15" fill="#ffffff"/><polygon points="12,5.2 14.4,9.8 12,15 9.6,9.8" fill="#e9f6fe"/><polygon points="6,15.7 18,15.7 15.2,21.8 8.8,21.8" fill="url(#bergU)" opacity=".92"/></g>
+    </svg>
+    ICEBERG
+  </div>
+  <div class="navlinks">
+    <a href="#watch">Watch</a>
+    <a href="#problem">The problem</a>
+    <a href="#how">How it works</a>
+    <a href="#who">Who it's for</a>
+    <a href="#contact">Contact</a>
+  </div>
+</div></nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="chip">In development · Solana</span>
+    <h1>Sell size.<br><span class="dim">Make no waves.</span></h1>
+    <p class="sub">A sealed auction venue for large orders in thin tokens.
+    Orders stay hidden. Everyone gets one fair price. Nothing leaks — before, during, or after.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#how">See how it works</a>
+      <a class="btn btn-ghost" href="#contact">Pilot access</a>
+    </div>
+  </div>
+  <svg class="berg" viewBox="0 0 680 320" fill="none" aria-label="An iceberg — the visible tip above the waterline, the mass hidden below">
+    <defs>
+      <linearGradient id="under" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2a93d5" stop-opacity=".8"/>
+        <stop offset="1" stop-color="#0a1524" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <polygon points="340,38 392,102 366,102 415,148 340,148" fill="#bcd9ec"/>
+    <polygon points="340,38 288,102 314,102 265,148 340,148" fill="#ffffff"/>
+    <polygon points="340,72 366,108 340,148 314,108" fill="#e9f6fe"/>
+    <line x1="20" y1="148" x2="660" y2="148" stroke="#4dc3ff" stroke-opacity=".5" stroke-dasharray="3 7"/>
+    <text x="26" y="140" fill="#5f7891" font-size="11" letter-spacing="2">WHAT THE MARKET SEES</text>
+    <text x="26" y="170" fill="#5f7891" font-size="11" letter-spacing="2">YOUR ACTUAL ORDER</text>
+    <polygon points="250,152 430,152 470,240 380,300 300,286 228,224" fill="url(#under)"/>
+  </svg>
+</header>
+
+<section id="watch">
+  <div class="wrap" style="text-align:center">
+    <div class="kicker">56 seconds</div>
+    <h2 style="margin:0 auto">Watch the same $210k exit, both ways.</h2>
+    <p class="lead" style="margin:14px auto 0">A market sell into a thin pool — then the identical position through a sealed Iceberg batch.</p>
+    <video src="iceberg-demo.mp4" style="display:block;width:100%;max-width:860px;margin:36px auto 0;border-radius:18px;border:1px solid var(--hairline);box-shadow:0 30px 80px rgba(0,0,0,.5)" autoplay muted loop playsinline controls></video>
+    <p style="margin-top:14px;font-size:12px;color:var(--ice-faint)">🔊 Narrated — tap the video to unmute. Illustrative example — not live trading data. <a href="demo.html" style="color:var(--ice-dim)">Interactive version →</a></p>
+  </div>
+</section>
+
+<section id="problem">
+  <div class="wrap">
+    <div class="kicker">The problem</div>
+    <h2>Big orders in thin tokens get slaughtered three ways at once.</h2>
+    <div class="rows">
+      <div class="row"><div class="n">01</div><div>
+        <h3>The curve punishes you</h3>
+        <p>Selling into a shallow pool moves the price against you with every token — you pay the impact even when a willing buyer exists somewhere.</p>
+      </div></div>
+      <div class="row"><div class="n">02</div><div>
+        <h3>The bots eat you</h3>
+        <p>The moment your order is visible, sandwich bots trade around it. You created the move — they collect it.</p>
+      </div></div>
+      <div class="row"><div class="n">03</div><div>
+        <h3>The leak bleeds you</h3>
+        <p>Even split into small clips, wallet-watchers spot the pattern by clip two and front-run the rest. The information is the cost.</p>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="kicker">How it works</div>
+    <h2>Sealed orders. One batch. One price.</h2>
+    <p class="lead">Trades happen in scheduled auctions instead of a public order book — so there is nothing to see and nothing to front-run.</p>
+    <div class="depth">
+      <div class="step">
+        <span class="tag">Step 1 — Commit</span>
+        <h3>Everyone submits sealed orders</h3>
+        <p>Buyers and sellers commit hidden orders — side, size, and limit price encrypted, funds escrowed on-chain. No one can see the book, because there isn't one.</p>
+      </div>
+      <div class="step">
+        <span class="tag">Step 2 — Reveal &amp; match</span>
+        <h3>The batch crosses at once</h3>
+        <p>At auction time, orders are revealed, verified against their commitments, and matched together — size meets size directly, off the curve.</p>
+      </div>
+      <div class="step">
+        <span class="tag">Step 3 — One fair price</span>
+        <h3>Everyone clears at the same price</h3>
+        <p>The whole batch settles at a single clearing price, bounded by an independent time-weighted market reference. No queue, no sequence, no one "in front of you" — sandwiching is impossible by construction.</p>
+      </div>
+    </div>
+    <div class="fair">
+      <h3>Fair by design</h3>
+      <ul>
+        <li><span class="ic">◆</span><span><b>Uniform price.</b> Buyers and sellers in a batch all get the same price — there is no better position to steal.</span></li>
+        <li><span class="ic">◆</span><span><b>Banded to reality.</b> Batches only clear inside a band around a manipulation-resistant market reference.</span></li>
+        <li><span class="ic">◆</span><span><b>No fishing.</b> Committed orders post a bond — walk away from your reveal and you forfeit it.</span></li>
+        <li><span class="ic">◆</span><span><b>Nothing leaks after.</b> Unfilled interest is never disclosed. The market never learns what almost traded.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="who">
+  <div class="wrap">
+    <div class="kicker">Who it's for</div>
+    <h2>Size on both sides of the water.</h2>
+    <div class="who">
+      <div class="card primary">
+        <span class="em">🐋</span>
+        <h3>Large holders</h3>
+        <p>Exit a position measured in percent of supply — without moving the chart, feeding the bots, or announcing it to every wallet-watcher on the timeline.</p>
+      </div>
+      <div class="card">
+        <span class="em">🏗️</span>
+        <h3>Token teams</h3>
+        <p>Run buybacks that accumulate real size at a fair batch price instead of getting front-run in the open.</p>
+      </div>
+      <div class="card">
+        <span class="em">🎯</span>
+        <h3>Patient bidders</h3>
+        <p>Rest hidden standing bids below market and get filled when real size shows up — a strategy no public venue can express.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap" style="text-align:center">
+    <div class="kicker">Get in early</div>
+    <h2 style="margin:0 auto">Moving size? Talk to us.</h2>
+    <p class="lead" style="margin:16px auto 0">Iceberg is in development. We're speaking with large holders, token teams, and market makers for the pilot cohort.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="mailto:pilot@iceberg.fund?subject=Iceberg%20pilot%20access">Request pilot access</a>
+      <a class="btn btn-ghost" href="https://x.com/IcebergFund" target="_blank" rel="noopener noreferrer">Follow @IcebergFund</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-in">
+      <div class="mark" style="font-size:13px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <g filter="url(#bergS)"><polygon points="12,2 17,9 14,9 19,15 12,15" fill="#bcd9ec"/><polygon points="12,2 7,9 10,9 5,15 12,15" fill="#ffffff"/><polygon points="12,5.2 14.4,9.8 12,15 9.6,9.8" fill="#e9f6fe"/><polygon points="6,15.7 18,15.7 15.2,21.8 8.8,21.8" fill="url(#bergU)" opacity=".92"/></g>
+        </svg>
+        ICEBERG
+      </div>
+      <div style="display:flex;gap:18px;align-items:center">
+        <a href="https://x.com/IcebergFund" target="_blank" rel="noopener noreferrer" aria-label="X" style="display:inline-flex;align-items:center;gap:7px"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@IcebergFund</a>
+        <a href="mailto:pilot@iceberg.fund">pilot@iceberg.fund</a>
+      </div>
+    </div>
+    <p class="honest">Iceberg is in development and not yet live. Nothing here is investment advice, and no auction, token, or venue is currently operating. Sealed batch auctions reduce information leakage and ordering games; they do not eliminate market risk.</p>
+  </div>
+</footer>
+
+</body>
+</html>

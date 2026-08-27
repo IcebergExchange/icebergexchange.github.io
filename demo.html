@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>ICEBERG — demo</title>
+<style>
+  :root{--deep:#060b14;--water:#0a1524;--surface:#0f1f33;--ice:#dff1fb;--dim:#9db8cc;--faint:#5f7891;
+        --glow:#4dc3ff;--red:#ff5d6c;--green:#3ddc97;--hair:rgba(160,200,235,.14)}
+  @font-face{font-family:'InterV';src:url('fonts/InterVariable.woff2') format('woff2');font-weight:100 900;font-style:normal}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--deep);color:var(--ice);font:15px/1.5 'InterV',-apple-system,BlinkMacSystemFont,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;font-feature-settings:'cv11','ss01';letter-spacing:-.01em}
+  /* jupiter-grade swap ticket */
+  .jup{width:360px;background:#12161f;border:1px solid rgba(160,200,235,.08);border-radius:20px;padding:14px;box-shadow:0 30px 70px rgba(0,0,0,.55)}
+  .jup .hd{display:flex;justify-content:space-between;align-items:center;padding:2px 6px 10px;font-size:12.5px;color:var(--faint)}
+  .jup .fieldx{background:#0b0f16;border:1px solid rgba(160,200,235,.06);border-radius:14px;padding:12px 14px;margin-top:8px}
+  .jup .frow{display:flex;justify-content:space-between;align-items:center}
+  .jup .flab{font-size:12px;color:var(--faint);font-weight:500}
+  .jup .fbal{font-size:11.5px;color:var(--faint)}
+  .jup .fbal b{color:var(--dim);font-weight:600;margin-left:6px}
+  .jup .tokpill{display:flex;align-items:center;gap:8px;background:#161c28;border:1px solid rgba(160,200,235,.1);border-radius:999px;padding:6px 12px 6px 7px;font-weight:700;font-size:15px}
+  .jup .coin{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#1a0f00}
+  .coin-tok{background:radial-gradient(circle at 30% 25%,#ffd37a,#f5900b 70%)}
+  .coin-sol{background:linear-gradient(135deg,#9945FF 10%,#14F195 90%)}
+  .jup .amt{text-align:right}
+  .jup .amt .n{font-size:22px;font-weight:650;letter-spacing:-.02em}
+  .jup .amt .u{font-size:12px;color:var(--faint);margin-top:1px}
+  .jup .mid{display:flex;justify-content:center;margin:-4px 0}
+  .jup .mid span{width:30px;height:30px;border-radius:50%;background:#161c28;border:4px solid #12161f;display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:13px}
+  .jup .meta{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:var(--faint);padding:10px 6px 2px}
+  .jup .pill-red{background:rgba(255,93,108,.14);border:1px solid rgba(255,93,108,.4);color:#ff8a97;border-radius:999px;padding:3px 10px;font-weight:700;font-size:12px}
+  .jup .cta{margin-top:12px;width:100%;text-align:center;border-radius:14px;padding:14px;font-weight:800;font-size:16px}
+  .cta-lime{background:#c7f284;color:#101508}
+  .cta-ice{background:linear-gradient(180deg,#5fcbff,#2a93d5);color:#04121f}
+  .cipher{font-family:'SF Mono',ui-monospace,Menlo,monospace;letter-spacing:0}
+  .toast{position:absolute;display:flex;gap:10px;align-items:flex-start;background:#0d1a12;border:1px solid rgba(61,220,151,.45);border-radius:14px;padding:12px 16px;font-size:13px;color:#bfeeda;box-shadow:0 18px 44px rgba(0,0,0,.5);opacity:0}
+  .toast .tick2{color:var(--green);font-size:16px;font-weight:800}
+  /* stage: fixed design px 1120x630, scaled by JS for viewing */
+  #frame{position:relative}
+  #capture-stage{position:relative;width:1120px;height:630px;background:
+    radial-gradient(1200px 500px at 50% -10%, #0d2036 0%, var(--deep) 60%);overflow:hidden;transform-origin:top left}
+  .scene{position:absolute;inset:0;opacity:0;pointer-events:none}
+  .kick{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--glow)}
+  .big{font-size:52px;font-weight:800;letter-spacing:-.03em;line-height:1.05}
+  .card{background:linear-gradient(180deg,var(--surface),var(--water));border:1px solid var(--hair);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+  .mono{font-variant-numeric:tabular-nums}
+  /* caption bar */
+  #cap{position:absolute;left:0;right:0;bottom:34px;text-align:center;z-index:50}
+  #cap span{display:inline-block;background:rgba(4,9,16,.85);border:1px solid var(--hair);border-radius:12px;
+    padding:10px 22px;font-size:19px;color:var(--ice);max-width:860px}
+  #disc{position:absolute;right:14px;top:12px;font-size:10.5px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;z-index:50}
+  /* wordmark */
+  .wm{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.18em;font-size:20px}
+  /* chart */
+  .chart{position:relative;background:#081120;border:1px solid var(--hair);border-radius:14px;overflow:hidden}
+  .chart .hdr{display:flex;justify-content:space-between;padding:10px 14px;font-size:12px;color:var(--faint);border-bottom:1px solid var(--hair)}
+  .px{font-size:15px;font-weight:700;color:var(--ice)}
+  .tick{position:absolute;font-size:11px;font-weight:700;padding:4px 9px;border-radius:8px;opacity:0;white-space:nowrap}
+  /* swap ui */
+  .swap{width:330px;padding:20px}
+  .swap .field{background:#081120;border:1px solid var(--hair);border-radius:12px;padding:12px 14px;margin-top:10px}
+  .swap .lbl{font-size:11px;color:var(--faint);letter-spacing:.08em;text-transform:uppercase}
+  .swap .val{font-size:20px;font-weight:700;margin-top:3px}
+  .impact{display:flex;justify-content:space-between;font-size:13px;margin-top:12px;padding:0 2px}
+  .sellbtn{margin-top:14px;width:100%;text-align:center;background:linear-gradient(180deg,#ff6b7a,#d63b4d);border-radius:12px;padding:12px;font-weight:800;color:#fff}
+  .commitbtn{margin-top:14px;width:100%;text-align:center;background:linear-gradient(180deg,#5fcbff,#2a93d5);border-radius:12px;padding:12px;font-weight:800;color:#04121f}
+  /* receipts */
+  .receipt{width:330px;padding:22px}
+  .receipt .row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--hair);font-size:14px}
+  .receipt .row:last-child{border-bottom:none}
+  .stamp{margin-top:14px;text-align:center;border-radius:10px;padding:9px;font-weight:800;font-size:16px}
+  /* feed */
+  .feed{width:400px}
+  .post{background:#0b1626;border:1px solid var(--hair);border-radius:14px;padding:14px 16px;margin-bottom:12px;font-size:14.5px;opacity:0}
+  .post .who{font-weight:700;font-size:13px;color:var(--dim);margin-bottom:4px}
+  /* bars */
+  .barwrap{width:420px}
+  .barrow{margin-top:18px}
+  .barlab{display:flex;justify-content:space-between;font-size:13px;color:var(--dim);margin-bottom:6px}
+  .bar{height:26px;border-radius:8px;background:#081120;border:1px solid var(--hair);overflow:hidden}
+  .bar i{display:block;height:100%;width:0%}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="bergU" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4dc3ff"/><stop offset="1" stop-color="#1a5f8e" stop-opacity=".25"/></linearGradient>
+<filter id="bergS" x="-50%" y="-50%" width="200%" height="200%">
+<feDropShadow dx="0" dy="1.1" stdDeviation="1.1" flood-color="#04121f" flood-opacity="0.6"/>
+<feDropShadow dx="0" dy="0" stdDeviation="2.4" flood-color="#4dc3ff" flood-opacity="0.4"/>
+</filter></defs></svg>
+<div id="frame"><div id="capture-stage">
+  <div id="disc">Illustrative example — not live data</div>
+
+  <!-- S1 intro -->
+  <div class="scene" id="s1">
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
+      <div class="wm">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><g filter="url(#bergS)"><polygon points="12,2 17,9 14,9 19,15 12,15" fill="#bcd9ec"/><polygon points="12,2 7,9 10,9 5,15 12,15" fill="#ffffff"/><polygon points="12,5.2 14.4,9.8 12,15 9.6,9.8" fill="#e9f6fe"/><polygon points="6,15.7 18,15.7 15.2,21.8 8.8,21.8" fill="url(#bergU)" opacity=".92"/></g></svg>
+        ICEBERG
+      </div>
+      <div class="card" style="padding:26px 34px;text-align:center">
+        <div class="kick" style="letter-spacing:.18em">Your position</div>
+        <div class="big mono" style="font-size:44px;margin-top:8px">21,000,000 $TOKEN</div>
+        <div style="color:var(--dim);margin-top:6px;font-size:18px">≈ <b class="mono" style="color:var(--ice)">$210,000</b> · 2.1% of supply · pool depth $310k</div>
+      </div>
+      <div class="big" style="font-size:34px;color:var(--dim)">Time to take profit.</div>
+    </div>
+  </div>
+
+  <!-- S2 old way: swap + crashing chart -->
+  <div class="scene" id="s2">
+    <div class="kick" style="position:absolute;top:44px;left:60px;color:var(--red)">The old way — market sell</div>
+    <div class="jup" style="position:absolute;left:52px;top:84px">
+      <div class="hd"><span style="color:var(--dim);font-weight:700">Instant</span><span>Slippage: Auto ▾</span></div>
+      <div class="fieldx">
+        <div class="frow"><span class="flab">Selling</span><span class="fbal">Balance <b>21,000,000</b><b style="color:#c7f284">MAX</b></span></div>
+        <div class="frow" style="margin-top:8px">
+          <span class="tokpill"><span class="coin coin-tok">T</span>$TOKEN <span style="color:var(--faint);font-weight:400">▾</span></span>
+          <span class="amt"><div class="n mono" id="s2amt">0</div><div class="u mono" id="s2amtu">$0.00</div></span>
+        </div>
+      </div>
+      <div class="mid"><span>↓</span></div>
+      <div class="fieldx">
+        <div class="frow"><span class="flab">Buying</span><span class="fbal"></span></div>
+        <div class="frow" style="margin-top:8px">
+          <span class="tokpill"><span class="coin coin-sol"></span>SOL <span style="color:var(--faint);font-weight:400">▾</span></span>
+          <span class="amt"><div class="n mono" id="s2recv">0</div><div class="u mono" id="s2recvu">$0.00</div></span>
+        </div>
+      </div>
+      <div class="meta"><span>Price impact</span><span class="pill-red" id="s2imp" style="opacity:0">−38.6%</span></div>
+      <div class="cta cta-lime" id="s2btn">Sell $TOKEN</div>
+    </div>
+    <div class="chart" style="position:absolute;right:60px;top:88px;width:600px;height:360px">
+      <div class="hdr"><span>$TOKEN / SOL</span><span class="px mono" id="s2px">$0.01000</span></div>
+      <svg id="s2svg" width="600" height="320" viewBox="0 0 600 320"></svg>
+      <div class="tick" id="t-pool" style="left:16px;top:52px;background:rgba(77,195,255,.10);border:1px solid rgba(77,195,255,.4);color:#9fd8f7">pool depth $310k — your order is 68% of it</div>
+      <div class="tick" id="t-curve" style="right:250px;top:120px;background:rgba(255,93,108,.15);border:1px solid rgba(255,93,108,.5);color:#ff9aa5">curve impact −$62,000</div>
+      <div class="tick" id="t-mev" style="right:110px;top:196px;background:rgba(255,93,108,.15);border:1px solid rgba(255,93,108,.5);color:#ff9aa5">sandwich bots −$18,600</div>
+    </div>
+    <div class="card receipt" id="s2rec" style="position:absolute;left:52px;top:118px;width:360px;opacity:0;padding:18px 22px;box-shadow:0 34px 90px rgba(0,0,0,.75)">
+      <div style="font-size:12px;color:var(--faint);font-weight:600;margin-bottom:6px">Execution report</div>
+      <div class="row"><span style="color:var(--faint)">Position value</span><b class="mono">$210,000</b></div>
+      <div class="row"><span style="color:var(--faint)">Price impact (thin pool)</span><b class="mono" style="color:var(--red)">−$62,000</b></div>
+      <div class="row"><span style="color:var(--faint)">Sandwich &amp; copy bots</span><b class="mono" style="color:var(--red)">−$18,600</b></div>
+      <div class="row"><span style="color:var(--faint)">You received</span><b class="mono" style="color:var(--red)">$129,400</b></div>
+      <div class="stamp" style="background:rgba(255,93,108,.12);border:1px solid rgba(255,93,108,.45);color:#ff8a97">−38.4% — three-quarters of it pure price impact</div>
+    </div>
+  </div>
+
+  <!-- S3 the leak -->
+  <div class="scene" id="s3">
+    <div class="kick" style="position:absolute;top:44px;left:60px;color:var(--red)">Try splitting it up? The market notices anyway</div>
+    <div class="feed" style="position:absolute;left:60px;top:100px">
+      <div class="post" id="p1"><div class="who">@chain_watcher</div>🚨 wallet 7xF4…q9 just clipped 2M $TOKEN. There's way more behind it.</div>
+      <div class="post" id="p2"><div class="who">@alpha_group (2,341 members)</div>front-run the rest — he's got 19M left, selling every 20 min like clockwork</div>
+      <div class="post" id="p3"><div class="who">@bot_feed</div>tracking 7xF4…q9 · auto-selling ahead of each clip ✅</div>
+    </div>
+    <div class="chart" style="position:absolute;right:60px;top:100px;width:560px;height:340px">
+      <div class="hdr"><span>$TOKEN / SOL — next 6 hours</span><span class="px mono" style="color:var(--red)" id="s3px">$0.00920</span></div>
+      <svg id="s3svg" width="560" height="300" viewBox="0 0 560 300"></svg>
+    </div>
+    <div style="position:absolute;left:60px;bottom:118px;color:var(--dim);font-size:17px">Your remaining clips sell into a market that <b style="color:#ff8a97">already knows.</b></div>
+  </div>
+
+  <!-- S4 iceberg way -->
+  <div class="scene" id="s4">
+    <div class="kick" style="position:absolute;top:44px;left:60px">The Iceberg way — sealed order</div>
+    <div class="jup" style="position:absolute;left:52px;top:84px">
+      <div class="hd"><span style="color:var(--glow);font-weight:700">◆ Sealed order</span><span>Batch #47 · closes 2h 14m</span></div>
+      <div class="fieldx">
+        <div class="frow"><span class="flab">Selling</span><span class="fbal">Balance <b>21,000,000</b></span></div>
+        <div class="frow" style="margin-top:8px">
+          <span class="tokpill"><span class="coin coin-tok">T</span>$TOKEN</span>
+          <span class="amt"><div class="n mono" id="s4size">0</div><div class="u mono" id="s4sizeu">$0.00</div></span>
+        </div>
+      </div>
+      <div class="fieldx">
+        <div class="frow"><span class="flab">Your floor price</span><span class="fbal">ref $0.010000</span></div>
+        <div class="frow" style="margin-top:8px">
+          <span class="tokpill" style="visibility:hidden">.</span>
+          <span class="amt"><div class="n mono" id="s4floor">—</div><div class="u mono" id="s4flooru"></div></span>
+        </div>
+      </div>
+      <div class="fieldx" id="s4commit" style="opacity:0">
+        <div class="frow"><span class="flab">Commitment</span><span class="fbal">bond 0.25 SOL</span></div>
+        <div class="frow" style="margin-top:6px"><span class="cipher mono" id="s4hash" style="font-size:13.5px;color:var(--glow)">—</span></div>
+      </div>
+      <div class="cta cta-ice" id="s4btn">Seal &amp; escrow 🔒</div>
+    </div>
+    <div class="toast" id="s4toast" style="left:472px;top:238px;width:330px;padding:9px 14px;font-size:12.5px">
+      <span class="tick2">✓</span>
+      <span><b style="color:#e9fff4">Escrowed on-chain</b> — 21,000,000 $TOKEN → vault <span class="mono">D8DP…aigp</span><br><span style="color:#7fb99d" class="mono">sig 5Kd9vRw2…xQ2f · confirmed</span></span>
+    </div>
+    <svg id="s4berg" style="position:absolute;right:80px;top:96px" width="540" height="330" viewBox="0 0 540 330">
+      <defs><linearGradient id="u2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a93d5" stop-opacity=".8"/><stop offset="1" stop-color="#0a1524" stop-opacity="0"/></linearGradient></defs>
+      <polygon points="270,34 310,86 290,86 328,122 270,122" fill="#bcd9ec"/>
+      <polygon points="270,34 230,86 250,86 212,122 270,122" fill="#ffffff"/>
+      <polygon points="270,60 290,90 270,122 250,90" fill="#e9f6fe"/>
+      <line x1="10" y1="126" x2="530" y2="126" stroke="#4dc3ff" stroke-opacity=".55" stroke-dasharray="3 7"/>
+      <text x="16" y="118" fill="#5f7891" font-size="12" letter-spacing="2">WHAT THE MARKET SEES</text>
+      <g id="s4order" opacity="0">
+        <rect x="150" y="150" width="240" height="52" rx="26" fill="#0e2138" stroke="#2a93d5" stroke-opacity=".7"/>
+        <text x="178" y="182" fill="#dff1fb" font-size="15" font-weight="700">🔒 sealed · 0x8f3a…9c21</text>
+      </g>
+      <polygon points="200,214 340,214 372,290 296,326 232,314 176,268" fill="url(#u2)" opacity=".55"/>
+    </svg>
+    <div class="chart" style="position:absolute;right:80px;top:436px;width:540px;height:150px">
+      <div class="hdr"><span>$TOKEN / SOL — while you wait</span><span class="px mono" style="color:var(--green)">$0.01000 · calm</span></div>
+      <svg id="s4svg" width="540" height="106" viewBox="0 0 540 106"></svg>
+    </div>
+  </div>
+
+  <!-- S5 batch clears -->
+  <div class="scene" id="s5">
+    <div class="kick" style="position:absolute;top:44px;left:60px">Auction time</div>
+    <div class="card" style="position:absolute;left:60px;top:96px;width:460px;padding:26px">
+      <div style="font-size:13px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase">Batch #47 · $TOKEN</div>
+      <div class="big mono" id="s5count" style="font-size:40px;margin-top:6px">00:03</div>
+      <div style="margin-top:14px;border-top:1px solid var(--hair);padding-top:12px;font-size:14.5px;color:var(--dim)" id="s5match">
+        <div style="padding:6px 0">🏗️ team buyback wallet · sealed bid</div>
+        <div style="padding:6px 0">🎯 2 standing dip-bids · sealed</div>
+        <div style="padding:6px 0">🐋 your 21M sell · sealed</div>
+      </div>
+      <div class="stamp" id="s5clr" style="opacity:0;background:rgba(61,220,151,.12);border:1px solid rgba(61,220,151,.45);color:#7ce8ba">CLEARED @ $0.00942 — one price for everyone</div>
+    </div>
+    <div class="card receipt" id="s5rec" style="position:absolute;right:60px;top:96px;opacity:0">
+      <div style="font-size:13px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase;margin-bottom:8px">Your settlement</div>
+      <div class="row"><span style="color:var(--faint)">Position value</span><b class="mono">$210,000</b></div>
+      <div class="row"><span style="color:var(--faint)">Cleared at</span><b class="mono">$0.00942</b></div>
+      <div class="row"><span style="color:var(--faint)">You received</span><b class="mono" style="color:var(--green)">$197,900</b></div>
+      <div class="stamp" style="background:rgba(61,220,151,.12);border:1px solid rgba(61,220,151,.45);color:#7ce8ba">94% of value kept</div>
+    </div>
+    <div style="position:absolute;right:60px;top:340px;width:330px;color:var(--dim);font-size:15px" id="s5note">Price checked against the market's time-weighted average — a batch can never clear at a fake price.</div>
+  </div>
+
+  <!-- S6 comparison -->
+  <div class="scene" id="s6">
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+      <div class="kick">Same position. Two exits.</div>
+      <div class="big" style="font-size:38px;margin-bottom:10px">$210,000 of $TOKEN</div>
+      <div class="barwrap">
+        <div class="barrow"><div class="barlab"><span>Market sell</span><b class="mono" style="color:#ff8a97">$129,400 kept</b></div>
+          <div class="bar"><i id="b1" style="background:linear-gradient(90deg,#d63b4d,#ff6b7a)"></i></div></div>
+        <div class="barrow"><div class="barlab"><span>ICEBERG batch</span><b class="mono" style="color:#7ce8ba">$197,900 kept</b></div>
+          <div class="bar"><i id="b2" style="background:linear-gradient(90deg,#2a93d5,#5fcbff)"></i></div></div>
+      </div>
+      <div class="card" id="s6delta" style="margin-top:26px;padding:14px 30px;opacity:0">
+        <span style="font-size:22px;font-weight:800;color:var(--green)" class="mono">+$68,500</span>
+        <span style="color:var(--dim)"> more in your pocket</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- S7 outro -->
+  <div class="scene" id="s7">
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
+      <div class="wm" style="font-size:26px">
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none"><g filter="url(#bergS)"><polygon points="12,2 17,9 14,9 19,15 12,15" fill="#bcd9ec"/><polygon points="12,2 7,9 10,9 5,15 12,15" fill="#ffffff"/><polygon points="12,5.2 14.4,9.8 12,15 9.6,9.8" fill="#e9f6fe"/><polygon points="6,15.7 18,15.7 15.2,21.8 8.8,21.8" fill="url(#bergU)" opacity=".92"/></g></svg>
+        ICEBERG
+      </div>
+      <div class="big" style="text-align:center">Sell size.<br><span style="color:var(--faint)">Make no waves.</span></div>
+      <div style="color:var(--glow);font-size:18px;font-weight:700">Pilot access open · pilot@iceberg.fund</div>
+    </div>
+  </div>
+
+  <div id="cap"><span id="captext"></span></div>
+</div></div>
+
+<script>
+// ───────────────────── master clock architecture ─────────────────────
+const DUR = 88000;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const $=id=>document.getElementById(id);
+
+// captions [start, end, text]
+const CAPS=[
+ [300,8340,"Alright — say you're holding twenty-one million tokens. About two hundred and ten grand. And you've decided it's time to take profit."],
+ [8800,22720,"Now, if you just market-sell into a thin pool — and this pool only holds three hundred and ten grand of real liquidity — the price moves against you with every single token. That's not bots. That's just math."],
+ [22800,33090,"Then the bots pile on, sandwiching the move you created. By the time it's done? You've kept a hundred and twenty-nine thousand — and most of that loss was pure price impact."],
+ [33800,44330,"Split it into little clips instead? Doesn't help. Wallet-watchers spot the pattern by clip two — and the whole market front-runs the rest of your exit."],
+ [45000,52340,"Here's the Iceberg way. You commit a sealed order. Size hidden, price hidden, escrowed on-chain."],
+ [52300,57380,"The market sees… nothing. Your order just sits below the surface."],
+ [58000,65150,"At auction time, sealed buyers and sellers cross directly. Team buybacks, standing bids, your sell."],
+ [65100,73380,"Everyone clears at one price, checked against the market's time-weighted average. Nobody's in front of you — because there is no front."],
+ [74000,82160,"Same position. Two exits. Sixty-eight and a half thousand dollars of difference. That's what leaking information costs."],
+ [83000,87100,"Iceberg. Sell size… make no waves."]
+];
+
+// candle helpers — deterministic
+function candles(svg, n, seq, w, h, up, down){
+  let x=8, cw=(w-16)/n-4, out='';
+  for(let i=0;i<n;i++){
+    const c=seq(i); // {o,c,hi,lo} in 0..1 (1=top)
+    const col=c.c<=c.o?up:down;
+    const bx=x, top=Math.min(c.o,c.c)*h, bh=Math.max(2,Math.abs(c.o-c.c)*h);
+    out+=`<line x1="${bx+cw/2}" y1="${c.hi*h}" x2="${bx+cw/2}" y2="${c.lo*h}" stroke="${col}" stroke-width="1.5" opacity=".8"/>`;
+    out+=`<rect x="${bx}" y="${top}" width="${cw}" height="${bh}" rx="1.5" fill="${col}"/>`;
+    x+=cw+4;
+  }
+  svg.innerHTML=out;
+}
+const G='#3ddc97', R='#ff5d6c';
+// s2: calm then cascade. progress p = how far the crash is (0..1)
+function drawS2(p){
+  const n=26, crashAt=10;
+  const formed=crashAt+Math.floor(p*(n-crashAt)); // crash sweeps left→right
+  const calm=i=>{const b=.40+Math.sin(i*1.7)*.06+((i%4)-1.5)*.012;
+    return {o:b,c:b-.035+((i%3)*.024),hi:b-.10,lo:b+.085};};
+  candles($('s2svg'), n, i=>{
+    if(i<crashAt||p<=0) return calm(i);
+    if(i>formed) return calm(i);
+    const base=Math.min(.38+(i-crashAt)*.033,.82);
+    const fall=.05+(i%3===0?.045:.02);
+    return {o:base,c:base+fall,hi:base-.03,lo:base+fall+.06};
+  },600,320,G,R);
+}
+function drawS3(p){
+  const n=30;
+  candles($('s3svg'), n, i=>{
+    const drift=.30+i*.017*clamp(p*1.4,0,1)+Math.sin(i*2.3)*.035;
+    const dn=(i%4!==0);
+    return {o:drift,c:drift+(dn?.055:-.03),hi:drift-.06,lo:drift+.095};
+  },560,300,G,R);
+}
+function drawS4(){
+  candles($('s4svg'), 30, i=>{
+    const b=.5+Math.sin(i*1.9)*.09+((i%5)-2)*.02;
+    return {o:b,c:b+((i%2)?.05:-.05),hi:b-.12,lo:b+.13};
+  },540,106,G,R);
+}
+
+// scene visibility windows
+const SCENES={s1:[0,8800],s2:[8800,33600],s3:[33600,44800],s4:[44800,57800],s5:[57800,73800],s6:[73800,82600],s7:[82600,DUR]};
+const fmt=n=>n.toLocaleString('en-US');
+
+function render(t){
+  t=clamp(t,0,DUR-1);
+  // scenes fade
+  for(const[id,[a,b]]of Object.entries(SCENES)){
+    const el=$(id);
+    const fin=clamp((t-a)/400,0,1), fout=clamp((b-t)/400,0,1);
+    el.style.opacity=Math.min(fin,fout);
+  }
+  // caption
+  const cap=CAPS.find(c=>t>=c[0]&&t<c[1]);
+  const ct=$('captext');
+  if(cap){ct.textContent=cap[2];ct.parentElement.style.opacity=1}else{ct.parentElement.style.opacity=0}
+
+  // S2 animation
+  if(t>=8400&&t<34000){
+    const lt=t-8800;
+    const typ=clamp(lt/1800,0,1);
+    $('s2amt').textContent=fmt(Math.round(ease(typ)*21000000));
+    $('s2amtu').textContent="$"+fmt(Math.round(ease(typ)*210000));
+    const impShow=clamp((lt-2300)/600,0,1);
+    $('t-pool').style.opacity=clamp((lt-3700)/400,0,1);
+    $('s2imp').style.opacity=impShow;
+    $('s2imp').textContent="−"+(ease(impShow)*38.6).toFixed(1)+"%";
+    $('s2recv').textContent=impShow>0?fmt(Math.round((210000-ease(impShow)*80600)/100)):"0";
+    $('s2recvu').textContent=impShow>0?("$"+fmt(Math.round(210000-ease(impShow)*80600))):"$0.00";
+    const p=clamp((lt-6200)/9000,0,1); // crash runs through the impact narration
+    drawS2(ease(p));
+    $('s2btn').style.filter=lt>5700&&lt<6150?'brightness(1.6)':'none';
+    const px=10000-ease(p)*3860;
+    $('s2px').textContent="$"+(px/1e6).toFixed(6);
+    $('s2px').style.color=p>.05?'#ff8a97':'var(--ice)';
+    $('t-curve').style.opacity=clamp((lt-12000)/400,0,1);
+    $('t-mev').style.opacity=clamp((lt-15000)/400,0,1);
+    $('s2rec').style.opacity=clamp((lt-19700)/500,0,1);
+  }
+  // S3
+  if(t>=33200&&t<45200){
+    const lt=t-33600; drawS3(clamp(lt/9200,0,1));
+    ['p1','p2','p3'].forEach((id,i)=>{$(id).style.opacity=clamp((lt-600-i*2600)/450,0,1);
+      $(id).style.transform=`translateY(${(1-clamp((lt-600-i*2600)/450,0,1))*14}px)`});
+  }
+  // S4
+  if(t>=44400&&t<58200){
+    const lt=t-44800; drawS4();
+    // type the size + floor
+    const typ=clamp(lt/1500,0,1);
+    const CIPH="a7f09b3ce18d4f6a2c5e9b0d7f3a1c8e";
+    const scr=(txt,k)=>txt.replace(/[0-9,\.]/g,(ch,idx)=>CIPH[(idx*7+k)%CIPH.length]);
+    const k=Math.floor(lt/90);
+    const sizeTxt=fmt(Math.round(ease(typ)*21000000));
+    const floorOn=lt>1600;
+    // scramble window: values encrypt before your eyes
+    const scrP=clamp((lt-2650)/500,0,1);
+    if(scrP<=0){
+      $('s4size').textContent=sizeTxt; $('s4size').className='n mono';
+      $('s4sizeu').textContent="$"+fmt(Math.round(ease(typ)*210000));
+      $('s4floor').textContent=floorOn?"$0.009800":"—";
+      $('s4flooru').textContent=floorOn?"−2% vs ref":"";
+    } else {
+      $('s4size').className='n mono cipher';
+      $('s4size').textContent=scr("21,000,000",k);
+      $('s4sizeu').textContent=scr("$210,000",k+3);
+      $('s4floor').className='n mono cipher';
+      $('s4floor').textContent=scr("$0.009800",k+5);
+      $('s4flooru').textContent="";
+    }
+    $('s4btn').style.filter=lt>2200&&lt<2650?'brightness(1.4)':'none';
+    $('s4btn').textContent=lt>2650?"Sealed ✓":"Seal & escrow 🔒";
+    // commitment hash assembles
+    const hashP=clamp((lt-3400)/900,0,1);
+    $('s4commit').style.opacity=clamp((lt-3300)/400,0,1);
+    const FULL="0x8f3ad41b77e2c09a5d6f…9c21";
+    $('s4hash').textContent=hashP>0?FULL.slice(0,Math.ceil(hashP*FULL.length)):"—";
+    // escrow toast on "escrowed on-chain"
+    const toastP=clamp((lt-5600)/450,0,1)*(1-clamp((lt-8200)/400,0,1));
+    $('s4toast').style.opacity=toastP;
+    $('s4toast').style.transform=`translateY(${(1-ease(toastP))*14}px)`;
+    // sealed capsule sinks below the waterline
+    const sink=ease(clamp((lt-8600)/1200,0,1));
+    $('s4order').setAttribute('opacity',clamp((lt-8400)/400,0,1));
+    $('s4order').setAttribute('transform',`translate(0,${(sink-1)*80})`);
+  }
+  // S5
+  if(t>=57400&&t<74200){
+    const lt=t-57800;
+    const secs=clamp(3-Math.floor(lt/1200),0,3);
+    $('s5count').textContent="00:0"+secs;
+    const cleared=lt>4300;
+    $('s5clr').style.opacity=cleared?clamp((lt-4300)/450,0,1):0;
+    $('s5count').style.color=cleared?'var(--green)':'var(--ice)';
+    if(cleared)$('s5count').textContent="CLEARED";
+    $('s5rec').style.opacity=clamp((lt-7600)/500,0,1);
+    $('s5rec').style.transform=`translateY(${(1-ease(clamp((lt-7600)/500,0,1)))*16}px)`;
+  }
+  // S6
+  if(t>=73400&&t<83000){
+    const lt=t-73800;
+    const p1=ease(clamp((lt-500)/1400,0,1)), p2=ease(clamp((lt-1200)/1400,0,1));
+    $('b1').style.width=(p1*61.6)+"%";
+    $('b2').style.width=(p2*94.2)+"%";
+    $('s6delta').style.opacity=clamp((lt-3200)/500,0,1);
+  }
+}
+
+// playback + export hooks
+let start=null, playing=true;
+function loop(ts){
+  if(start===null)start=ts;
+  let t=(ts-start)%DUR;
+  if(playing)render(t);
+  requestAnimationFrame(loop);
+}
+window.__demoSeek=(ms)=>{playing=false;render(ms)};
+window.__demoDur=DUR;
+requestAnimationFrame(loop);
+
+// scale stage to viewport for humans (export uses natural size)
+function fit(){
+  if(location.search.includes('export'))return;
+  const s=Math.min(innerWidth/1120,innerHeight/630)*.96;
+  const st=$('capture-stage');st.style.transform=`scale(${s})`;
+  $('frame').style.width=(1120*s)+'px';$('frame').style.height=(630*s)+'px';
+}
+addEventListener('resize',fit);fit();
+</script>
+</body>
+</html>
