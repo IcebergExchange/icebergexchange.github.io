@@ -154,6 +154,22 @@
   .scen button:hover,.scen button.on{color:var(--ice);border-color:rgba(89,199,255,.5);background:rgba(89,199,255,.09)}
   .out-market.reverted{background:linear-gradient(180deg,rgba(64,34,10,.4),rgba(24,14,6,.25))}
   .out-market.reverted .lab,.out-market.reverted .big{color:#ffb35c}
+  .ichart{position:relative;margin:16px 0 4px;border:1px solid var(--hairline);border-radius:14px;background:linear-gradient(180deg,rgba(4,10,18,.7),rgba(8,18,32,.4));padding:14px 14px 8px;overflow:hidden}
+  .ichart::before{content:"";position:absolute;inset:0;background:radial-gradient(60% 80% at 20% 0%,rgba(89,199,255,.06),transparent 70%);pointer-events:none}
+  .ichart-hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;position:relative}
+  .ichart-hd .t{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ice-faint);font-weight:600}
+  .ichart-hd .lg{display:flex;gap:14px;font-size:10.5px;font-weight:560}
+  .ichart-hd .lg i{font-style:normal;display:inline-flex;align-items:center;gap:5px}
+  .ichart-hd .lg .dm{color:var(--coral)} .ichart-hd .lg .di{color:var(--mint)}
+  .ichart-hd .lg .sw{width:14px;height:2.5px;border-radius:2px;display:inline-block}
+  .isvg{display:block;width:100%;height:150px}
+  .isvg path.area-mkt{transition:d .55s var(--ease)}
+  .isvg path.line-mkt{transition:d .55s var(--ease)}
+  .isvg .line-ice,.isvg .lbl-ice,.isvg .avg-mkt{transition:all .55s var(--ease)}
+  .isvg text{font-family:"InterVar",sans-serif;font-variant-numeric:tabular-nums}
+  .ichart-x{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ice-faint);letter-spacing:.06em;margin-top:2px;padding:0 2px}
+  .ichart-rev{position:absolute;inset:34px 14px 22px;display:none;align-items:center;justify-content:center;border-radius:10px;background:rgba(24,10,12,.55);backdrop-filter:blur(2px);border:1px dashed rgba(255,138,151,.5);color:var(--coral);font-size:12.5px;font-weight:600;letter-spacing:.02em;text-align:center;padding:10px}
+  .ichart.reverted .ichart-rev{display:flex}
   .sim-out{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:600px){.sim-out{grid-template-columns:1fr}}
   .out-card{border-radius:14px;padding:15px 18px;border:1px solid var(--hairline)}
@@ -357,7 +373,7 @@
 
         <div id="wManualBox">
         <div class="tokbar">
-          <input id="tokIn" placeholder="Paste any Solana token address \u2014 or type a ticker (e.g. BONK)" spellcheck="false" autocomplete="off">
+          <input id="tokIn" placeholder="Paste any Solana token address — or type a ticker (e.g. BONK)" spellcheck="false" autocomplete="off">
           <button id="tokGo">Load</button>
         </div>
         <div class="tokchip" id="tokChip"></div>
@@ -389,6 +405,26 @@
         </div>
 
         <div id="wOut">
+        <div class="ichart" id="ichart">
+          <div class="ichart-hd">
+            <span class="t">Price you receive · % of spot</span>
+            <span class="lg"><i class="dm"><span class="sw" style="background:var(--coral)"></span>Market sell</i><i class="di"><span class="sw" style="background:var(--mint)"></span>Iceberg</i></span>
+          </div>
+          <svg class="isvg" id="isvg" viewBox="0 0 400 150" preserveAspectRatio="none" aria-label="Price impact: market sell walks down the curve; Iceberg clears at one price">
+            <defs>
+              <linearGradient id="gmkt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a97" stop-opacity=".34"/><stop offset="1" stop-color="#ff8a97" stop-opacity="0"/></linearGradient>
+              <linearGradient id="gice" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ce8ba" stop-opacity=".26"/><stop offset="1" stop-color="#7ce8ba" stop-opacity="0"/></linearGradient>
+            </defs>
+            <g id="igrid" stroke="rgba(163,199,232,.09)" stroke-width="1"></g>
+            <path id="areaIce" class="area-ice" fill="url(#gice)" d=""></path>
+            <path id="areaMkt" class="area-mkt" fill="url(#gmkt)" d=""></path>
+            <line id="lineIce" class="line-ice" stroke="#7ce8ba" stroke-width="2.2" x1="0" y1="0" x2="400" y2="0"></line>
+            <path id="lineMkt" class="line-mkt" fill="none" stroke="#ff8a97" stroke-width="2.2" d=""></path>
+            <line id="avgMkt" class="avg-mkt" stroke="#ff8a97" stroke-width="1.2" stroke-dasharray="3 4" stroke-opacity=".7" x1="0" y1="0" x2="400" y2="0"></line>
+          </svg>
+          <div class="ichart-rev" id="ichartRev">Order exceeds your slippage cap — it reverts. Split it up and wallet-watchers front-run the rest.</div>
+          <div class="ichart-x"><span>0</span><span>your position sold</span><span>100%</span></div>
+        </div>
         <div class="sim-out">
           <div class="out-card out-market">
             <div class="lab">Market sell</div>
@@ -715,16 +751,16 @@
         : 'https://api.dexscreener.com/latest/dex/search?q=' + encodeURIComponent(q);
       const j = await (await fetch(url)).json();
       const best = aggPairs(isAddr ? j : j?.pairs);
-      if (!best || !best.liq) { $id('simNote').textContent = 'Token not found \u2014 check the address or ticker'; $id('tokGo').textContent = 'Load'; return; }
+      if (!best || !best.liq) { $id('simNote').textContent = 'Token not found — check the address or ticker'; $id('tokGo').textContent = 'Load'; return; }
       tok = best;
       pool = best.liq;
       setVal('poolVal', pool);
       const r = $id('poolR'); r.value = Math.max(0, Math.min(100, xOfPool(Math.max(1e4, Math.min(pool, 2e7)))));
       r.style.setProperty('--p', r.value + '%');
       renderTok();
-      $id('simNote').textContent = 'Live data \u2014 projection, not a quote';
+      $id('simNote').textContent = 'Live data — projection, not a quote';
       calc();
-    } catch (_) { $id('simNote').textContent = 'Lookup failed \u2014 try again'; }
+    } catch (_) { $id('simNote').textContent = 'Lookup failed — try again'; }
     $id('tokGo').textContent = 'Load';
   }
   $id('tokGo').addEventListener('click', lookupToken);
@@ -742,6 +778,31 @@
     calc();
   });
 
+  // ── high-tech price-impact chart ──────────────────────────────────
+  const CH = { XL: 3, XR: 397, YT: 12, YB: 138, YMIN: 0.34, YMAX: 1.0 };
+  const px = (f) => CH.XL + f * (CH.XR - CH.XL);
+  const pyf = (v) => { const c = Math.max(CH.YMIN, Math.min(CH.YMAX, v)); return CH.YT + (1 - (c - CH.YMIN) / (CH.YMAX - CH.YMIN)) * (CH.YB - CH.YT); };
+  (function initGrid() {
+    const g = document.getElementById('igrid'); if (!g) return;
+    let h = '';
+    for (const v of [1.0, 0.75, 0.5]) { const y = pyf(v); h += '<line x1="3" y1="' + y.toFixed(1) + '" x2="397" y2="' + y.toFixed(1) + '"/>'; h += '<text x="397" y="' + (y - 2).toFixed(1) + '" fill="rgba(163,199,232,.35)" font-size="8" text-anchor="end">' + (v * 100) + '%</text>'; }
+    g.innerHTML = h;
+  })();
+  function drawImpact(S, Q, mkt, iceLo, iceHi, slipF, imp) {
+    const svg = document.getElementById('isvg'); if (!svg) return;
+    const N = 48, pts = [];
+    for (let i = 0; i <= N; i++) { const f = i / N; const p = 1 / Math.pow(1 + (f * S) / Q, 2); pts.push([px(f), pyf(p)]); }
+    const line = 'M' + pts.map((p) => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' L');
+    const area = line + ' L' + CH.XR + ',' + CH.YB + ' L' + CH.XL + ',' + CH.YB + ' Z';
+    document.getElementById('lineMkt').setAttribute('d', line);
+    document.getElementById('areaMkt').setAttribute('d', area);
+    const avgY = pyf(Q / (Q + S));                       // market average fill
+    document.getElementById('avgMkt').setAttribute('y1', avgY); document.getElementById('avgMkt').setAttribute('y2', avgY);
+    const iceY = pyf(((iceLo + iceHi) / 2) / S);          // iceberg one price
+    const lI = document.getElementById('lineIce'); lI.setAttribute('y1', iceY); lI.setAttribute('y2', iceY);
+    document.getElementById('areaIce').setAttribute('d', 'M3,' + iceY.toFixed(1) + ' L397,' + iceY.toFixed(1) + ' L397,' + CH.YB + ' L3,' + CH.YB + ' Z');
+    document.getElementById('ichart').classList.toggle('reverted', imp > slipF);
+  }
   function calc() {
     let S, Q, label;
     if (mode === 'wallet' && sel) {
@@ -783,27 +844,28 @@
     const grossLo = S * 0.90, grossHi = S * 0.995;
     const feeLo = grossLo * FEE, feeHi = grossHi * FEE;
     const iceLo = grossLo - feeLo, iceHi = grossHi - feeHi;
-    $id('iceOut').textContent = fmt(iceLo) + '\u2013' + fmt(iceHi) + ' kept';
-    $id('iceFee').textContent = 'No slippage setting. One price at or above your floor \u2014 or you pay nothing.';
+    $id('iceOut').textContent = fmt(iceLo) + '–' + fmt(iceHi) + ' kept';
+    $id('iceFee').textContent = 'No slippage setting. One price at or above your floor — or you pay nothing.';
     $id('iceBrk').innerHTML =
       row('Position value', fmt(S)) +
-      row('Clears at one price in the band', fmt(grossLo) + '\u2013' + fmt(grossHi)) +
-      row('Iceberg fee \u2014 0.75%, fills only', '\u2212' + fmt(feeLo) + '\u2013' + fmt(feeHi), 'neg') +
+      row('Clears at one price in the band', fmt(grossLo) + '–' + fmt(grossHi)) +
+      row('Iceberg fee — 0.75%, fills only', '\u2212' + fmt(feeLo) + '–' + fmt(feeHi), 'neg') +
       row('Bond (0.25 SOL, refunded at reveal)', '\u00b1$0', 'zero') +
       row("Batch doesn't cross? Full refund", '$0 cost', 'zero') +
-      row('You keep', fmt(iceLo) + '\u2013' + fmt(iceHi), 'pos');
+      row('You keep', fmt(iceLo) + '–' + fmt(iceHi), 'pos');
+    drawImpact(S, Q, mkt, iceLo, iceHi, slipF, imp);
     const gain = iceLo - mkt;
     $id('delta').innerHTML = imp > slipF
       ? 'The market sell can\u2019t even execute at this size. The sealed batch clears it at one price.'
       : (gain > 0
         ? 'Worst case, you keep <b>+' + fmt(gain) + '</b> more.'
-        : 'At this size, a market sell is competitive \u2014 Iceberg is for orders big relative to the pool.');
+        : 'At this size, a market sell is competitive — Iceberg is for orders big relative to the pool.');
     const ex = $id('wExec');
     ex.style.display = '';
     const what = label ? ('~' + fmt(S) + ' of ' + label) : ('~' + fmt(S) + ' of a token I hold');
     ex.dataset.body = 'I want to seal an exit of ' + what + ' when Iceberg launches on mainnet.';
-    ex.dataset.subject = 'Launch access \u2014 sealed exit' + (label ? ': ' + label : '');
-    $id('wExecNote').textContent = 'Reserves your spot for mainnet launch. Nothing moves until the venue is live \u2014 never overpromised.';
+    ex.dataset.subject = 'Launch access — sealed exit' + (label ? ': ' + label : '');
+    $id('wExecNote').textContent = 'Reserves your spot for mainnet launch. Nothing moves until the venue is live — never overpromised.';
   }
 
 
@@ -876,7 +938,7 @@
     try { navigator.clipboard?.writeText(ex.dataset.body + ' (send to: pilot@iceberg.fund)'); } catch (_) {}
     const ok = $id('execOk');
     ok.style.display = 'block';
-    ok.textContent = 'Request copied to your clipboard \u2014 email it to pilot@iceberg.fund (also opening your mail app).';
+    ok.textContent = 'Request copied to your clipboard — email it to pilot@iceberg.fund (also opening your mail app).';
     location.href = 'mailto:pilot@iceberg.fund?subject=' + encodeURIComponent(ex.dataset.subject || 'Iceberg launch access') + '&body=' + encodeURIComponent(ex.dataset.body || '');
   });
 </script>
