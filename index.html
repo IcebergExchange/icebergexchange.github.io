@@ -79,8 +79,6 @@
     content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .02 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  .chip{display:inline-flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:560;color:var(--glow);border:1px solid rgba(89,199,255,.28);background:rgba(89,199,255,.05);border-radius:999px;padding:7px 16px;margin-bottom:34px}
-  .chip .dot{width:5px;height:5px;border-radius:50%;background:var(--glow);box-shadow:0 0 8px rgba(89,199,255,.9)}
   h1{
     font-size:clamp(2.9rem,7.2vw,5.1rem);line-height:1.015;letter-spacing:-.042em;font-weight:640;
     font-feature-settings:"cv11","ss01";
@@ -223,11 +221,10 @@
 
 <header class="hero" id="top">
   <div class="wrap">
-    <span class="chip rv"><span class="dot"></span>In development · Solana</span>
-    <h1 class="rv d1">Sell size.<br><span class="dim">Make no waves.</span></h1>
-    <p class="sub rv d2">A sealed auction venue for large orders in thin tokens.
+    <h1 class="rv">Sell size.<br><span class="dim">Make no waves.</span></h1>
+    <p class="sub rv d1">A sealed auction venue for large orders in thin tokens.
     <b>Orders stay hidden. Everyone gets one fair price.</b> Nothing leaks — before, during, or after.</p>
-    <div class="cta-row rv d3">
+    <div class="cta-row rv d2">
       <a class="btn btn-primary" href="#how">See how it works
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       <a class="btn btn-ghost" href="#contact">Pilot access</a>
