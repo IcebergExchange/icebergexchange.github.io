@@ -262,7 +262,7 @@
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.5"/><path d="M3.5 19c.8-3 3-4.5 5.5-4.5s4.7 1.5 5.5 4.5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M15.5 14.6c2.3.2 4.2 1.6 5 4.4"/></svg>
       Who it's for</a>
   </div>
-  <a class="side-cta" href="mailto:pilot@iceberg.fund?subject=Iceberg%20access">Request access</a>
+  <a class="side-cta" href="mailto:pilot@iceberg.fund?subject=Iceberg%20launch%20access">Trade at launch</a>
   <div class="side-foot">
     <a href="https://x.com/IcebergFund" target="_blank" rel="noopener noreferrer"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>@IcebergFund</a>
     <a href="https://github.com/IcebergExchange" target="_blank" rel="noopener noreferrer"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>github.com/IcebergExchange</a>
@@ -278,7 +278,7 @@
     </svg>
     ICEBERG
   </a>
-  <a class="side-cta" href="mailto:pilot@iceberg.fund?subject=Iceberg%20access">Request access</a>
+  <a class="side-cta" href="mailto:pilot@iceberg.fund?subject=Iceberg%20launch%20access">Trade at launch</a>
 </div>
 
 <main>
@@ -296,8 +296,29 @@
       <div class="sim-in">
         <div class="sim-head">
           <span class="sim-title">Simulate your exit</span>
-          <span class="sim-note">Illustrative — not a quote</span>
+          <span class="sim-note" id="simNote">Live pool math — projection, not a quote</span>
         </div>
+
+        <div id="wStart">
+          <button class="btn btn-primary" id="wConnect" style="width:100%;justify-content:center;padding:13px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="3"/><path d="M16 12.5h.01M3 9.5h18"/></svg>
+            Connect wallet — see your real exit
+          </button>
+          <div style="text-align:center;margin-top:10px"><a href="#" id="wManual" style="font-size:12px;color:var(--ice-faint);text-decoration:none;border-bottom:1px solid var(--hairline-strong)">No wallet handy? Use quick presets</a></div>
+        </div>
+
+        <div id="wHold" style="display:none">
+          <div class="field"><label id="wHoldLbl">Your holdings</label>
+            <div id="wList" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto"></div>
+          </div>
+          <div class="field" style="margin-top:10px"><label>Amount to sell</label>
+            <div class="seg" id="wPct">
+              <button data-v="25">25%</button><button data-v="50">50%</button><button data-v="75">75%</button><button data-v="100" class="on">100%</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="wManualBox" style="display:none">
         <div class="sim-controls">
           <div class="field">
             <label>Position</label>
@@ -317,6 +338,9 @@
             </div>
           </div>
         </div>
+        </div>
+
+        <div id="wOut" style="display:none">
         <div class="sim-out">
           <div class="out-card out-market">
             <div class="lab">Market sell</div>
@@ -326,14 +350,15 @@
           <div class="out-card out-ice">
             <div class="lab">Iceberg batch</div>
             <div class="big mono" id="iceOut">—</div>
-            <div class="fine">One price · 0.75% fee</div>
+            <div class="fine" id="iceFee"></div>
           </div>
         </div>
         <div class="sim-delta" id="delta"></div>
+        <a class="btn btn-primary" id="wExec" style="display:none;width:100%;justify-content:center;margin-top:14px" href="#">Seal this exit at launch</a>
+        <div style="text-align:center;margin-top:8px;font-size:10.5px;color:var(--ice-faint)" id="wExecNote"></div>
+        </div>
       </div>
     </div>
-  </div>
-
   <div class="scene rv d2">
     <div class="halo"></div>
     <svg class="berg" id="berg" viewBox="0 0 680 340" fill="none" aria-label="An iceberg — the visible tip above the waterline, the mass hidden below">
@@ -495,7 +520,7 @@
       <div class="contact-in">
         <h2>Moving size? Talk to us.</h2>
         <div class="cta-row">
-          <a class="btn btn-primary" href="mailto:pilot@iceberg.fund?subject=Iceberg%20access">Request access</a>
+          <a class="btn btn-primary" href="mailto:pilot@iceberg.fund?subject=Iceberg%20launch%20access">Trade at launch</a>
           <a class="btn btn-ghost" href="https://x.com/IcebergFund" target="_blank" rel="noopener noreferrer">@IcebergFund</a>
         </div>
       </div>
@@ -536,11 +561,15 @@
     }, { passive: true });
   }
 
-  // exit simulator — constant-product illustration
+  // ── exit simulator: wallet-connected (read-only) with manual fallback ──
   const fmt = (n) => '$' + Math.round(n).toLocaleString('en-US');
-  let size = 210000, pool = 1000000;
+  const FEE = 0.0075;
+  let size = 210000, pool = 1000000, mode = 'manual', sel = null, pct = 100;
+  const $id = (x) => document.getElementById(x);
+  const show = (x, on) => { $id(x).style.display = on ? '' : 'none'; };
+
   function segWire(id, set) {
-    document.getElementById(id).addEventListener('click', (e) => {
+    $id(id).addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
       e.currentTarget.querySelectorAll('button').forEach((x) => x.classList.remove('on'));
       b.classList.add('on'); set(Number(b.dataset.v)); calc();
@@ -548,20 +577,112 @@
   }
   segWire('segSize', (v) => size = v);
   segWire('segPool', (v) => pool = v);
+  segWire('wPct', (v) => pct = v);
+
   function calc() {
-    const raw = size * pool / (pool + size);
-    const mkt = Math.max(raw - size * 0.015, 0);
-    const impactPct = ((size - raw) / size * 100).toFixed(1);
-    const iceLo = size * 0.90 * 0.9925, iceHi = size * 0.995 * 0.9925;
-    document.getElementById('mktOut').textContent = '~' + fmt(mkt) + ' kept';
-    document.getElementById('mktFine').textContent = impactPct + '% lost to the curve + bots';
-    document.getElementById('iceOut').textContent = fmt(iceLo) + '–' + fmt(iceHi) + ' kept';
+    let S, Q, label;
+    if (mode === 'wallet' && sel) {
+      S = sel.value * pct / 100;
+      Q = Math.max(sel.liq / 2, 1);            // quote side ≈ half of aggregate pool liquidity
+      label = sel.symbol;
+    } else { S = size; Q = pool / 2; label = null; }
+    if (!S || S < 100) { show('wOut', false); return; }
+    show('wOut', true);
+    const raw = S * Q / (Q + S);
+    const mkt = Math.max(raw - S * 0.015, 0);
+    const impactPct = ((S - raw) / S * 100).toFixed(1);
+    const feeLo = S * 0.90 * FEE, feeHi = S * 0.995 * FEE;
+    const iceLo = S * 0.90 * (1 - FEE), iceHi = S * 0.995 * (1 - FEE);
+    $id('mktOut').textContent = '~' + fmt(mkt) + ' kept';
+    $id('mktFine').textContent = impactPct + '% lost to the curve + bots' + (label ? ' (from ' + label + "'s live liquidity)" : '');
+    $id('iceOut').textContent = fmt(iceLo) + '–' + fmt(iceHi) + ' kept';
+    $id('iceFee').textContent = 'One price in the band. Our full fee: 0.75% = ' + fmt(feeLo) + '–' + fmt(feeHi) + '. No spread, no MEV tax.';
     const gain = iceLo - mkt;
-    document.getElementById('delta').innerHTML = gain > 0
+    $id('delta').innerHTML = gain > 0
       ? 'Worst case, you keep <b>+' + fmt(gain) + '</b> more.'
       : 'At this size, a market sell is competitive — Iceberg is for orders big relative to the pool.';
+    const ex = $id('wExec');
+    if (mode === 'wallet' && sel) {
+      ex.style.display = '';
+      ex.href = 'mailto:pilot@iceberg.fund?subject=' + encodeURIComponent('Launch access — sealed exit: ' + label) +
+        '&body=' + encodeURIComponent('I want to seal an exit of ~' + fmt(S) + ' of ' + label + ' when Iceberg launches on mainnet.');
+      $id('wExecNote').textContent = 'Reserves your spot for mainnet launch. Nothing moves until the venue is live — never overpromised.';
+    } else ex.style.display = 'none';
   }
-  calc();
+
+  $id('wManual').addEventListener('click', (e) => {
+    e.preventDefault(); mode = 'manual';
+    show('wStart', false); show('wManualBox', true); calc();
+  });
+
+  // Phantom (or any injected Solana wallet) — READ-ONLY: we only look up balances.
+  const RPC = 'https://api.mainnet-beta.solana.com';
+  async function rpc(method, params) {
+    const r = await fetch(RPC, { method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) });
+    return (await r.json()).result;
+  }
+  $id('wConnect').addEventListener('click', async () => {
+    const prov = window.phantom?.solana || window.solana;
+    if (!prov) { $id('simNote').textContent = 'No Solana wallet found — install Phantom, or use presets'; return; }
+    try {
+      $id('wConnect').textContent = 'Connecting…';
+      const res = await prov.connect();
+      const owner = res.publicKey.toString();
+      $id('wConnect').textContent = 'Reading your holdings…';
+      const toks = await rpc('getTokenAccountsByOwner', [owner,
+        { programId: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' }, { encoding: 'jsonParsed' }]);
+      const bals = (toks?.value || []).map((a) => {
+        const i = a.account.data.parsed.info;
+        return { mint: i.mint, amt: Number(i.tokenAmount.uiAmount || 0) };
+      }).filter((x) => x.amt > 0);
+      const mints = bals.map((b) => b.mint).slice(0, 60);
+      const holdings = [];
+      for (let i = 0; i < mints.length; i += 30) {
+        const chunk = mints.slice(i, i + 30);
+        const pairs = await (await fetch('https://api.dexscreener.com/tokens/v1/solana/' + chunk.join(','))).json();
+        const byMint = {};
+        for (const p of (Array.isArray(pairs) ? pairs : [])) {
+          const m = p.baseToken?.address; if (!m) continue;
+          const o = byMint[m] || (byMint[m] = { symbol: p.baseToken.symbol, logo: p.info?.imageUrl, price: 0, liq: 0 });
+          o.liq += (p.liquidity?.usd || 0);
+          o.price = Math.max(o.price, Number(p.priceUsd || 0));
+        }
+        for (const b of bals) if (byMint[b.mint]) {
+          const t = byMint[b.mint];
+          const value = b.amt * t.price;
+          if (value > 25) holdings.push({ ...t, amt: b.amt, value, mint: b.mint });
+        }
+      }
+      holdings.sort((a, b) => b.value - a.value);
+      const list = $id('wList');
+      if (!holdings.length) { $id('simNote').textContent = 'No priced holdings found — use presets'; return; }
+      list.innerHTML = holdings.slice(0, 8).map((h, i) =>
+        '<button class="hrow" data-i="' + i + '" style="display:flex;align-items:center;gap:10px;background:rgba(4,10,18,.7);border:1px solid var(--hairline);border-radius:11px;padding:9px 12px;cursor:pointer;color:var(--ice);font-family:inherit;text-align:left">' +
+        (h.logo ? '<img src="' + h.logo + '" style="width:24px;height:24px;border-radius:50%;object-fit:cover">' : '<span style="width:24px;height:24px;border-radius:50%;background:rgba(89,199,255,.15);display:inline-block"></span>') +
+        '<b style="font-size:13.5px">' + h.symbol + '</b>' +
+        '<span style="margin-left:auto;text-align:right;font-size:12.5px" class="mono">' + fmt(h.value) +
+        '<div style="font-size:10px;color:var(--ice-faint)">pool ' + fmt(h.liq) + '</div></span></button>').join('');
+      window.__holdings = holdings;
+      list.addEventListener('click', (e) => {
+        const b = e.target.closest('.hrow'); if (!b) return;
+        list.querySelectorAll('.hrow').forEach((x) => x.style.borderColor = 'var(--hairline)');
+        b.style.borderColor = 'rgba(89,199,255,.6)';
+        sel = window.__holdings[Number(b.dataset.i)]; calc();
+      });
+      mode = 'wallet';
+      show('wStart', false); show('wHold', true);
+      $id('simNote').textContent = 'Read-only — we never ask for signatures or custody';
+      sel = holdings[0]; list.querySelector('.hrow').style.borderColor = 'rgba(89,199,255,.6)';
+      calc();
+    } catch (err) {
+      $id('wConnect').innerHTML = 'Connect wallet — see your real exit';
+      $id('simNote').textContent = 'Connection declined — presets below';
+      show('wManualBox', true); mode = 'manual'; calc();
+    }
+  });
+
+  if (mode === "manual") { /* initial idle state shows connect */ }
 </script>
 </body>
 </html>
