@@ -240,6 +240,11 @@
         <div class="vrow"><span>Your order</span><b id="s4mine" style="color:var(--glow);opacity:0">just one more sealed cell</b></div>
       </div>
     </div>
+    <div id="s4guard" style="position:absolute;left:60px;top:472px;width:560px;display:flex;align-items:center;gap:12px;background:rgba(255,179,92,.07);border:1px solid rgba(255,179,92,.35);border-radius:12px;padding:11px 16px;font-size:12.5px;color:#ffd9ab;opacity:0">
+      <svg width="20" height="20" viewBox="0 0 30 30" fill="none"><path d="M15 4.4c-4 0-6.5 2.9-6.5 6.6v4.4l-2.1 3.9c-.3.6.1 1.3.8 1.3h15.6c.7 0 1.1-.7.8-1.3l-2.1-3.9V11c0-3.7-2.5-6.6-6.5-6.6Z" stroke="#ffb35c" stroke-width="1.6" stroke-linejoin="round" fill="rgba(255,179,92,.09)"/><path d="M12.6 23.4a2.5 2.5 0 0 0 4.8 0" stroke="#ffb35c" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span><b style="color:#ffe9cf">Reveal guardian armed</b> — we count down your reveal window and alert you. Cancel any time before the batch closes for a <b style="color:#7ce8ba">full refund</b>.</span>
+      <span class="mono" style="margin-left:auto;font-weight:700;color:#ffb35c">2h 13m</span>
+    </div>
     <div class="chart" style="position:absolute;right:60px;top:392px;width:400px;height:150px">
       <div class="hdr"><span>$BREAKING / SOL — while you wait</span><span class="px mono" style="color:var(--green)">$0.008574 · calm</span></div>
       <svg id="s4svg" width="400" height="106" viewBox="0 0 400 106"></svg>
@@ -274,13 +279,30 @@
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
       <div class="kick">Same position. Two exits.</div>
       <div class="big" style="font-size:38px;margin-bottom:10px">$210,000 of $BREAKING</div>
-      <div class="barwrap">
-        <div class="barrow"><div class="barlab"><span>Market sell</span><b class="mono" style="color:#ff8a97">$86,700 kept</b></div>
-          <div class="bar"><i id="b1" style="background:linear-gradient(90deg,#d63b4d,#ff6b7a)"></i></div></div>
-        <div class="barrow"><div class="barlab"><span>ICEBERG batch</span><b class="mono" style="color:#7ce8ba">$197,900 kept</b></div>
-          <div class="bar"><i id="b2" style="background:linear-gradient(90deg,#2a93d5,#5fcbff)"></i></div></div>
+      <div class="chart" style="width:640px;padding:16px 18px 10px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--faint);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">
+          <span>Price you receive · % of spot</span>
+          <span><i style="font-style:normal;color:#ff8a97">— Market sell</i>&nbsp;&nbsp;<i style="font-style:normal;color:#7ce8ba">— Iceberg</i></span>
+        </div>
+        <svg id="s6svg" width="604" height="182" viewBox="0 0 604 182">
+          <defs>
+            <linearGradient id="s6gm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a97" stop-opacity=".32"/><stop offset="1" stop-color="#ff8a97" stop-opacity="0"/></linearGradient>
+            <linearGradient id="s6gi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ce8ba" stop-opacity=".22"/><stop offset="1" stop-color="#7ce8ba" stop-opacity="0"/></linearGradient>
+          </defs>
+          <g stroke="rgba(160,200,235,.12)"><line x1="0" y1="6" x2="604" y2="6"/><line x1="0" y1="88" x2="604" y2="88"/><line x1="0" y1="170" x2="604" y2="170"/></g>
+          <text x="600" y="17" fill="#5f7891" font-size="10" text-anchor="end">100%</text>
+          <text x="600" y="85" fill="#5f7891" font-size="10" text-anchor="end">70%</text>
+          <text x="600" y="167" fill="#5f7891" font-size="10" text-anchor="end">40%</text>
+          <path id="s6areaI" fill="url(#s6gi)" d=""></path>
+          <path id="s6areaM" fill="url(#s6gm)" d=""></path>
+          <line id="s6lineI" stroke="#7ce8ba" stroke-width="2.5" x1="0" y1="40" x2="0" y2="40"/>
+          <path id="s6lineM" fill="none" stroke="#ff8a97" stroke-width="2.5" d=""></path>
+          <text id="s6lblI" x="8" y="34" fill="#7ce8ba" font-size="13" font-weight="700" opacity="0">ICEBERG · one price · $197,900 kept</text>
+          <text id="s6lblM" x="300" y="158" fill="#ff8a97" font-size="13" font-weight="700" opacity="0">market walk-down · $86,700 kept</text>
+        </svg>
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--faint);margin-top:2px"><span>0</span><span>your 24.5M sold</span><span>100%</span></div>
       </div>
-      <div class="card" id="s6delta" style="margin-top:26px;padding:14px 30px;opacity:0">
+      <div class="card" id="s6delta" style="margin-top:10px;padding:14px 30px;opacity:0">
         <span style="font-size:22px;font-weight:800;color:var(--green)" class="mono">+$111,200</span>
         <span style="color:var(--dim)"> more in your pocket</span>
       </div>
@@ -456,6 +478,7 @@ function render(t){
     $('s4toast').style.opacity=toastP;
     $('s4toast').style.transform=`translateY(${(1-ease(toastP))*14}px)`;
     // your order joins the sealed grid — just one more hidden cell
+    $('s4guard').style.opacity=clamp((lt-4600)/500,0,1);
     const joinP=clamp((lt-8400)/500,0,1);
     const mine=$('s4cellmine');
     if(mine){mine.style.opacity=joinP;
@@ -477,9 +500,25 @@ function render(t){
   // S6
   if(t>=73400&&t<83000){
     const lt=t-73800;
-    const p1=ease(clamp((lt-500)/1400,0,1)), p2=ease(clamp((lt-1200)/1400,0,1));
-    $('b1').style.width=(p1*41.3)+"%";
-    $('b2').style.width=(p2*94.2)+"%";
+    const p1=ease(clamp((lt-400)/1800,0,1)), p2=ease(clamp((lt-1600)/1200,0,1));
+    // market curve: price falls to (1-f*S/(Q+... )) — use spot fraction 1/(1+fS/Q)^2 with S/Q tuned to end ~41%
+    (function(){
+      const W=604, T=6, B=170, YMAX=1.0, YMIN=0.40;
+      const py=v=>{const c=Math.max(YMIN,Math.min(YMAX,v));return T+(1-(c-YMIN)/(YMAX-YMIN))*(B-T);};
+      const R=1.335; // S/Q ratio → end price ≈ 1/(1+R)^2 ≈ 18% → clamp; avg ≈ 41.3% kept curve shape
+      const N=60, n=Math.max(2,Math.floor(N*p1)); let pts=[];
+      for(let i=0;i<=n;i++){const f=(i/N); const v=1/Math.pow(1+f*R,2); pts.push([f*W, py(v)]);}
+      const line='M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' L');
+      $('s6lineM').setAttribute('d',line);
+      $('s6areaM').setAttribute('d',line+' L'+pts[pts.length-1][0].toFixed(1)+','+B+' L0,'+B+' Z');
+      const iceY=py(0.942);
+      $('s6lineI').setAttribute('y1',iceY); $('s6lineI').setAttribute('y2',iceY);
+      $('s6lineI').setAttribute('x2',(p2*W).toFixed(1));
+      $('s6areaI').setAttribute('d','M0,'+iceY.toFixed(1)+' L'+(p2*W).toFixed(1)+','+iceY.toFixed(1)+' L'+(p2*W).toFixed(1)+','+B+' L0,'+B+' Z');
+      $('s6lblI').setAttribute('opacity',clamp((lt-2600)/400,0,1));
+      $('s6lblI').setAttribute('y',(iceY-8).toFixed(1));
+      $('s6lblM').setAttribute('opacity',clamp((lt-2200)/400,0,1));
+    })();
     $('s6delta').style.opacity=clamp((lt-3200)/500,0,1);
   }
 }
