@@ -1,3 +1,11 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ICEBERG — Venue</title>
+<meta name="description" content="The ICEBERG venue client. Seal an exit, reveal it, settle at one uniform price — sealed batch auctions on Solana.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='u' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%234dc3ff'/%3E%3Cstop offset='1' stop-color='%231a5f8e' stop-opacity='.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='5' fill='%23060b14'/%3E%3Cpolygon points='12,3 16.5,9.5 14,9.5 18.5,14.8 12,14.8' fill='%23bcd9ec'/%3E%3Cpolygon points='12,3 7.5,9.5 10,9.5 5.5,14.8 12,14.8' fill='%23ffffff'/%3E%3Cpolygon points='6.5,15.4 17.5,15.4 15,20.8 9,20.8' fill='url(%23u)'/%3E%3C/svg%3E">
 <style>
   @font-face{font-family:"InterVar";src:url("fonts/InterVariable.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
   :root{--abyss:#04070d;--deep:#060b14;--water:#0a1524;--ice:#eaf4fb;--ice-dim:#a3bdd1;--ice-faint:#5e7891;--glow:#59c7ff;--mint:#7ce8ba;--coral:#ff8a97;--amber:#ffb35c;--hairline:rgba(163,199,232,.10);--hairline-strong:rgba(163,199,232,.18);--ease:cubic-bezier(.22,.9,.28,1)}
@@ -17,13 +25,35 @@
   .banner.info{background:rgba(89,199,255,.07);border-color:rgba(89,199,255,.25);color:var(--ice-dim)}
   .banner.ok{background:rgba(124,232,186,.08);border-color:rgba(124,232,186,.3);color:var(--mint)}
   .banner.warn{background:rgba(255,138,151,.08);border-color:rgba(255,138,151,.3);color:var(--coral)}
+  .banner button{margin-left:12px;background:transparent;border:1px solid currentColor;color:inherit;font-family:inherit;font-size:12px;font-weight:600;padding:4px 12px;border-radius:8px;cursor:pointer}
+  .guard{display:none;border:1px solid rgba(255,179,92,.4);background:linear-gradient(180deg,rgba(255,179,92,.10),rgba(255,179,92,.03));border-radius:14px;padding:14px 18px;margin-bottom:20px;align-items:center;gap:14px;flex-wrap:wrap}
+  .guard.show{display:flex}
+  .guard.open{border-color:rgba(124,232,186,.5);background:linear-gradient(180deg,rgba(124,232,186,.12),rgba(124,232,186,.03));box-shadow:0 0 30px rgba(124,232,186,.08)}
+  .guard.missed{border-color:rgba(255,138,151,.4);background:linear-gradient(180deg,rgba(255,138,151,.09),rgba(255,138,151,.03))}
+  .guard-ico{flex:0 0 auto}
+  .guard-msg{flex:1;min-width:220px}
+  .guard-msg b{font-size:14px;font-weight:620}
+  .guard-msg .mini{margin-top:2px}
+  .guard-cd{font-size:22px;font-weight:660;letter-spacing:-.01em;min-width:86px;text-align:right}
+  .guard.open .guard-cd{color:var(--mint)}
+  .guard:not(.open):not(.missed) .guard-cd{color:var(--amber)}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  @media(max-width:820px){.grid{grid-template-columns:1fr}}
+  @media(max-width:820px){.grid{grid-template-columns:1fr}.guard-cd{text-align:left}}
   .panel{background:linear-gradient(180deg,var(--water),#081120);border:1px solid var(--hairline);border-radius:18px;padding:24px}
   .ph{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px}
   .ph h2{font-size:17px;font-weight:600;letter-spacing:-.01em}
+  .ph .ph-r{display:flex;align-items:baseline;gap:10px}
   .phase{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--mint);padding:4px 10px;border:1px solid rgba(124,232,186,.3);border-radius:999px}
   .mini{font-size:12px;color:var(--ice-faint)}
+  .tl{display:flex;margin:2px 0 18px}
+  .tls{flex:1;text-align:center;position:relative;font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;color:var(--ice-faint);padding-top:17px;transition:color .3s}
+  .tls::before{content:"";position:absolute;top:3px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;background:var(--deep);border:1.5px solid var(--hairline-strong);transition:all .3s}
+  .tls::after{content:"";position:absolute;top:8px;left:calc(50% + 9px);width:calc(100% - 18px);height:1.5px;background:var(--hairline-strong)}
+  .tls:last-child::after{display:none}
+  .tls.done{color:var(--ice-dim)} .tls.done::before{background:var(--glow);border-color:var(--glow)}
+  .tls.done::after{background:rgba(89,199,255,.45)}
+  .tls.on{color:var(--glow)} .tls.on::before{background:var(--glow);border-color:var(--glow);box-shadow:0 0 9px rgba(89,199,255,.8)}
+  .tls.warn{color:var(--amber)} .tls.warn::before{background:var(--amber);border-color:var(--amber)}
   .mkt{border:1px solid var(--hairline);border-radius:12px;padding:12px 14px;margin-bottom:18px}
   .mkt-row{display:flex;justify-content:space-between;padding:5px 0;font-size:12.5px;color:var(--ice-dim)} .mkt-row b{color:var(--ice);font-weight:560}
   .seg2{display:flex;background:rgba(4,10,18,.7);border:1px solid var(--hairline);border-radius:12px;padding:4px;gap:4px;margin-bottom:16px}
@@ -37,6 +67,12 @@
   .tnote{font-size:11.5px;color:var(--ice-faint);margin-top:8px;line-height:1.5}
   .btn-primary{background:linear-gradient(180deg,#6fd2ff,#2b95d8);color:#04121f;border:0;font-family:inherit;font-weight:590;border-radius:12px;cursor:pointer;transition:all .18s var(--ease)}
   .btn-primary:disabled{opacity:.5;cursor:not-allowed} .btn-primary.wide{width:100%;padding:14px;font-size:15px} .btn-primary.sm{padding:8px 16px;font-size:13px;border-radius:9px}
+  .btn-ghost{background:transparent;border:1px solid var(--hairline-strong);color:var(--ice-dim);font-family:inherit;font-size:12.5px;font-weight:560;padding:7px 15px;border-radius:9px;cursor:pointer;transition:all .18s}
+  .btn-ghost:hover{color:var(--coral);border-color:rgba(255,138,151,.4)}
+  .btn-ghost:disabled{opacity:.5;cursor:not-allowed}
+  .spin{display:inline-block;width:12px;height:12px;border:2px solid rgba(4,18,31,.25);border-top-color:#04121f;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:8px}
+  .btn-ghost .spin{border-color:rgba(163,199,232,.25);border-top-color:var(--ice-dim)}
+  @keyframes sp{to{transform:rotate(360deg)}}
   .foot{font-size:11.5px;color:var(--ice-faint);margin-top:10px;text-align:center}
   .orders{display:flex;flex-direction:column;gap:10px;min-height:80px}
   .empty{color:var(--ice-faint);font-size:13px;text-align:center;padding:24px 12px}
@@ -44,10 +80,16 @@
   .oc-top{display:flex;align-items:center;gap:10px} .oc-amt{margin-left:2px;font-size:13.5px;font-weight:560} .oc-badge{margin-left:auto;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ice-faint)}
   .pill{font-size:10.5px;font-weight:700;letter-spacing:.08em;padding:3px 9px;border-radius:7px} .pill.s1{color:var(--coral);background:rgba(255,138,151,.12)} .pill.s0{color:var(--mint);background:rgba(124,232,186,.12)}
   .oc-cd{font-size:12px;color:var(--ice-dim);margin-top:8px} .urgent{color:var(--amber);font-weight:560}
-  .oc-sig{font-size:11px;color:var(--ice-faint);margin-top:6px} .oc-act{margin-top:10px}
+  .oc-sig{font-size:11px;color:var(--ice-faint);margin-top:6px} .oc-act{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+  .rcpt{margin-top:10px;border-top:1px dashed var(--hairline-strong);padding-top:4px}
+  .rcpt .tr{border-top:none;padding:4px 0;font-size:12px}
+  .rcpt-h{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--ice-faint);margin:4px 0 2px}
+  .linkbtn{background:none;border:0;color:var(--ice-faint);font-family:inherit;font-size:12px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+  .linkbtn:hover{color:var(--ice-dim)}
   .mech{margin-top:20px;font-size:12.5px;color:var(--ice-faint)} .mech summary{cursor:pointer;font-weight:560;color:var(--ice-dim)} .mech ol{margin:10px 0 0 16px;line-height:1.7} .mech b{color:var(--ice-dim)}
 </style>
-
+</head>
+<body>
 <script>window.__ICEBERG_IDL = {
   "address": "GsNRrRA1ZmbxrfvJyp7p5DSgRjuYXBz3BY4ViffXBrmW",
   "metadata": {
@@ -1441,10 +1483,31 @@
 
   <div id="banner" class="banner"></div>
 
+  <!-- REVEAL GUARDIAN — protects the bond. Shown whenever a sealed order on
+       this device could still need a reveal. -->
+  <div id="guardian" class="guard" role="status" aria-live="polite">
+    <svg class="guard-ico" width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+      <path d="M15 4.4c-4 0-6.5 2.9-6.5 6.6v4.4l-2.1 3.9c-.3.6.1 1.3.8 1.3h15.6c.7 0 1.1-.7.8-1.3l-2.1-3.9V11c0-3.7-2.5-6.6-6.5-6.6Z" stroke="#ffb35c" stroke-width="1.6" stroke-linejoin="round" fill="rgba(255,179,92,.09)"/>
+      <path d="M12.6 23.4a2.5 2.5 0 0 0 4.8 0" stroke="#ffb35c" stroke-width="1.6" stroke-linecap="round"/>
+      <circle cx="22.4" cy="6.8" r="3.1" fill="#04070d" stroke="#ffb35c" stroke-width="1.4"/>
+      <circle cx="22.4" cy="6.8" r="1.15" fill="#ffb35c"/>
+    </svg>
+    <div class="guard-msg"><b id="gTitle">—</b><div class="mini" id="gSub"></div></div>
+    <div class="guard-cd mono" id="gCd" aria-label="countdown"></div>
+    <button id="gBtn" class="btn-primary sm" style="display:none">Reveal all</button>
+  </div>
+
   <div class="grid">
     <!-- LEFT: seal an order -->
     <section class="panel">
       <div class="ph"><h2>Seal an exit</h2><span class="phase" id="phaseTag">—</span></div>
+
+      <div class="tl" id="timeline" aria-label="batch phase">
+        <div class="tls" data-s="0">Commit</div>
+        <div class="tls" data-s="1">Reveal</div>
+        <div class="tls" data-s="2">Clear</div>
+        <div class="tls" data-s="3">Settle</div>
+      </div>
 
       <div class="mkt" id="mktHead">
         <div class="mkt-row"><span>Market</span><b id="mMkt">—</b></div>
@@ -1473,11 +1536,11 @@
 
     <!-- RIGHT: your sealed orders -->
     <section class="panel">
-      <div class="ph"><h2>Your sealed orders</h2><span class="mini" id="ordCount">0</span></div>
+      <div class="ph"><h2>Your sealed orders</h2><span class="ph-r"><button id="clrFin" class="linkbtn" style="display:none">Clear finished</button><span class="mini" id="ordCount">0</span></span></div>
       <div id="orders" class="orders"><div class="empty">No sealed orders yet. Seal one on the left — it's saved to this device so you can always reveal it.</div></div>
       <details class="mech"><summary>How a batch works</summary>
         <ol>
-          <li><b>Commit</b> — your order commits as a hash with funds escrowed. No one can see side, size, or price.</li>
+          <li><b>Commit</b> — your order commits as a hash with funds escrowed. No one can see side, size, or price. You can cancel it any time before the commit window closes — escrow and bond come back in full.</li>
           <li><b>Reveal</b> — after the commit window closes, you reveal. The program checks it against your commitment; your bond returns.</li>
           <li><b>Clear</b> — the keeper proposes one uniform price; the program verifies it's the maximal cross inside the band.</li>
           <li><b>Settle</b> — you're filled at that one price (0.75% fee on filled size only), or fully refunded if the batch doesn't cross. Miss your reveal and only the 0.25 SOL bond is forfeit — your escrow always returns.</li>
@@ -1486,7 +1549,6 @@
     </section>
   </div>
 </main>
-
 <script type="module">
 // ICEBERG venue dApp — browser client. Ports lib/wire.mjs EXACTLY (same
 // discriminators, PDAs, commit hash, escrow math, account layouts). Nothing
@@ -1510,6 +1572,7 @@ const CFG = window.__ICEBERG_CFG || {
 const conn = new Connection(CFG.rpc, 'confirmed');
 const PROGRAM_ID = new PublicKey(CFG.programId);
 const P1 = 1_000_000_000n, FEE_BPS = 75n;
+const MAINNET_GENESIS = '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdpKuc147dw2N9d';
 const $ = (id) => document.getElementById(id);
 const fmtN = (n) => Number(n).toLocaleString('en-US');
 
@@ -1605,28 +1668,74 @@ const phaseTimes = (m) => ({
 });
 const chainNow = async () => { const d = new Uint8Array((await conn.getAccountInfo(SYSVAR_CLOCK_PUBKEY)).data); return Number(new DataView(d.buffer, d.byteOffset, d.byteLength).getBigInt64(32, true)); };
 
+// Local estimate of chain time: offset captured at every refresh so the 1 s
+// countdown ticker never needs an RPC call.
+let chainOff = null;
+const lnow = () => chainOff === null ? Math.floor(Date.now() / 1000) : Math.floor(Date.now() / 1000 + chainOff);
+
 // ── local order custody (salt saved atomically BEFORE broadcast) ──
 const LS = 'iceberg.orders.' + CFG.network;
 const loadOrders = () => { try { return JSON.parse(localStorage.getItem(LS) || '[]'); } catch { return []; } };
 const saveOrders = (o) => localStorage.setItem(LS, JSON.stringify(o));
 function persistOrder(rec) { const all = loadOrders(); all.unshift(rec); saveOrders(all); }
 function updateOrder(id, patch) { const all = loadOrders(); const i = all.findIndex((x) => x.id === id); if (i >= 0) { all[i] = { ...all[i], ...patch }; saveOrders(all); } }
+function removeOrders(pred) { saveOrders(loadOrders().filter((o) => !pred(o))); }
+const myOrders = () => loadOrders().filter((o) => o.network === CFG.network && (!MKT || o.market === MKT.market.toString()));
 
-// ── wallet ──
-let wallet = null, owner = null;
+// ── wallet (connect / disconnect / account switch) ──
+let wallet = null, owner = null, hooked = false;
 function provider() { return window.phantom?.solana || window.solana; }
+function setWallet(p, pk) {
+  wallet = p; owner = pk;
+  $('connect').textContent = pk ? short(pk) : 'Connect wallet';
+  if (pk) hookProvider(p);
+}
+function hookProvider(p) {
+  if (hooked || !p?.on) return; hooked = true;
+  p.on('disconnect', () => { setWallet(null, null); banner('Wallet disconnected. Your sealed orders are safe on this device — reconnect to act on them.', 'info'); refresh(); });
+  p.on('accountChanged', (pk) => {
+    if (pk) { owner = new PublicKey(pk.toString()); $('connect').textContent = short(owner); banner('Wallet account changed to ' + short(owner) + '.', 'info'); }
+    else setWallet(null, null);
+    refresh();
+  });
+}
 async function connect() {
   const p = provider();
   if (!p) { banner('No Solana wallet found — install Phantom to seal orders.', 'warn'); return; }
-  const r = await p.connect(); wallet = p; owner = r.publicKey;
-  $('connect').textContent = owner.toString().slice(0, 4) + '…' + owner.toString().slice(-4);
+  try {
+    const r = await p.connect();
+    setWallet(p, r.publicKey);
+  } catch (e) {
+    banner(/reject/i.test(e.message || '') ? 'Connection request declined in the wallet.' : 'Wallet connection failed: ' + (e.message || e), 'warn');
+    return;
+  }
   refresh();
 }
+function friendlyErr(e) {
+  const m = (e && (e.message || String(e))) || 'unknown error';
+  if (/reject|denied|declined/i.test(m)) return 'declined in the wallet — nothing was sent.';
+  if (/PhaseClosed|phase window closed/i.test(m)) return 'the window for this action has closed — the page will re-sync.';
+  if (/BadReveal|does not match commitment/i.test(m)) return 'the reveal did not match the sealed commitment.';
+  if (/insufficient.*lamports|0x1(?![0-9a-f])/i.test(m)) return 'insufficient SOL to pay for the transaction.';
+  if (/blockhash|node is behind|timed? ?out|failed to fetch|networkerror|load failed/i.test(m)) return 'the RPC connection failed — check your network and retry.';
+  return m;
+}
 async function signSend(tx) {
+  // Errors thrown before the transaction could possibly reach the chain are
+  // tagged notBroadcast — the ONLY case where a caller may drop a local
+  // custody record. Anything after send() is ambiguous: keep the salt.
   tx.feePayer = owner;
-  tx.recentBlockhash = (await conn.getLatestBlockhash('confirmed')).blockhash;
-  const signed = await wallet.signTransaction(tx);
-  const sig = await conn.sendRawTransaction(signed.serialize(), { skipPreflight: false });
+  let signed, sig;
+  try {
+    tx.recentBlockhash = (await conn.getLatestBlockhash('confirmed')).blockhash;
+    signed = await wallet.signTransaction(tx);
+  } catch (e) { e.notBroadcast = true; throw e; }
+  try {
+    sig = await conn.sendRawTransaction(signed.serialize(), { skipPreflight: false });
+  } catch (e) {
+    if (/simulation failed|preflight|invalid|too large|custom program error/i.test(e.message || '')) e.notBroadcast = true;
+    throw e;
+  }
   // Confirm by HTTP polling (getSignatureStatuses) — never depend on a
   // websocket subscription, which many RPCs and networks drop.
   for (let i = 0; i < 45; i++) {
@@ -1640,6 +1749,17 @@ async function signSend(tx) {
   throw new Error('confirmation timed out');
 }
 
+// ── network sanity: the configured cluster must be the cluster we think it is ──
+let genesisChecked = false;
+async function checkNetwork() {
+  if (genesisChecked || CFG.network !== 'mainnet-beta') { genesisChecked = true; return; }
+  try {
+    const g = await conn.getGenesisHash();
+    genesisChecked = true;
+    if (g !== MAINNET_GENESIS) banner('The configured RPC is NOT mainnet (genesis mismatch). Do not trade here — this endpoint reports a different cluster.', 'warn', true);
+  } catch { /* preview or offline: checked on next successful refresh */ }
+}
+
 // ── market state ──
 let MKT = null, MSTATE = null;
 async function loadMarket() {
@@ -1651,6 +1771,40 @@ async function loadMarket() {
   MKT = { venue, ...p, feeVault: CFG.feeVault };
   MSTATE = parseMarket(info.data);
   return MSTATE;
+}
+
+// ── balance precheck: catch a doomed seal at the desk, before signing ──
+async function tokenBalance(mint) {
+  // Public mainnet RPCs 403 token-account reads from browsers; Jupiter's lite
+  // API is keyless + browser-safe. A configured CORS RPC answers directly.
+  if (CFG.network === 'mainnet-beta' && !CFG.corsRpc) {
+    const j = await (await fetch('https://lite-api.jup.ag/ultra/v1/balances/' + owner.toString())).json();
+    const v = j?.[mint.toString()];
+    return v?.amount != null ? BigInt(v.amount) : 0n;
+  }
+  const ata = getAssociatedTokenAddressSync(new PublicKey(mint), owner);
+  try { return BigInt((await conn.getTokenAccountBalance(ata)).value.amount); }
+  catch (e) { if (/could not find|Invalid param|not found/i.test(e.message || '')) return 0n; throw e; }
+}
+async function precheckFunds(sideNow, esc) {
+  const mint = sideNow === 1 ? MSTATE.baseMint : MSTATE.quoteMint;
+  const label = sideNow === 1 ? 'base' : 'quote';
+  try {
+    const lam = await conn.getBalance(owner);
+    const need = Number(MSTATE.bondLamports) + 5_000_000; // bond + rent/fee headroom
+    if (lam < need) {
+      banner('Not enough SOL for the anti-spam bond: this seal needs about ' + (need / 1e9).toFixed(3) + ' SOL (bond ' + Number(MSTATE.bondLamports) / 1e9 + ' + fees); the wallet holds ' + (lam / 1e9).toFixed(4) + '.', 'warn');
+      return false;
+    }
+  } catch { /* balance read failed: don't block the seal on a read error */ }
+  try {
+    const bal = await tokenBalance(mint);
+    if (bal < esc) {
+      banner('Insufficient ' + label + ' balance: sealing escrows ' + fmtN(esc.toString()) + ' units but the wallet holds ' + fmtN(bal.toString()) + '.', 'warn');
+      return false;
+    }
+  } catch { /* fail-open on read errors; the program still enforces escrow */ }
+  return true;
 }
 
 // ── seal (commit) ──
@@ -1673,25 +1827,33 @@ function renderTicket() {
     row('Escrow now', fmtN(esc.toString()) + ' ' + escMint + ' units') +
     row('Anti-spam bond', bond + ' SOL (refunded on reveal)') +
     row('Fee', '0.75% on fills only', 'muted') +
-    '<p class="tnote">' + feeNote + ' Reveal after the commit window or you forfeit only the bond — escrow always returns.</p>';
+    '<p class="tnote">' + feeNote + ' Cancel any time before the commit window closes for a full refund. Reveal after it closes or you forfeit only the bond — escrow always returns.</p>';
 }
 const row = (l, v, c) => '<div class="tr ' + (c || '') + '"><span>' + l + '</span><b class="mono">' + v + '</b></div>';
 
 async function seal() {
   if (!wallet) return connect();
   if (!MSTATE) return;
+  // ask for notification permission inside the user gesture — the guardian
+  // uses it to alert when the reveal window opens
+  try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch { }
   const { size, limit } = amounts();
-  const now = await chainNow();
-  const { commitCut } = phaseTimes(MSTATE);
-  if (now >= commitCut) { banner('Commit window has closed for this batch. Wait for the next epoch.', 'warn'); return; }
-  if (size < MSTATE.minSize) { banner('Size below the market minimum (' + fmtN(MSTATE.minSize.toString()) + ').', 'warn'); return; }
-  const lo = (MSTATE.refPrice * (10000n - BigInt(MSTATE.bandBps))) / 10000n;
-  const hi = (MSTATE.refPrice * (10000n + BigInt(MSTATE.bandBps))) / 10000n;
-  if (side === 1 && limit > hi) { banner('Sell floor is above the band — it could never fill this epoch.', 'warn'); return; }
-  if (side === 0 && limit < lo) { banner('Buy cap is below the band — it could never fill this epoch.', 'warn'); return; }
-
-  setBusy(true, 'Preparing sealed order…');
+  let rec = null;
+  setBusy(true, null, 'Checking funds…');
   try {
+    await loadMarket(); // fresh order_count → fresh order PDA index
+    const now = await chainNow(); chainOff = now - Date.now() / 1000;
+    const { commitCut } = phaseTimes(MSTATE);
+    if (now >= commitCut) { banner('Commit window has closed for this batch. Wait for the next epoch.', 'warn'); return; }
+    if (size < MSTATE.minSize) { banner('Size below the market minimum (' + fmtN(MSTATE.minSize.toString()) + ').', 'warn'); return; }
+    const lo = (MSTATE.refPrice * (10000n - BigInt(MSTATE.bandBps))) / 10000n;
+    const hi = (MSTATE.refPrice * (10000n + BigInt(MSTATE.bandBps))) / 10000n;
+    if (side === 1 && limit > hi) { banner('Sell floor is above the band — it could never fill this epoch.', 'warn'); return; }
+    if (side === 0 && limit < lo) { banner('Buy cap is below the band — it could never fill this epoch.', 'warn'); return; }
+    const esc = requiredEscrow(side, size, limit);
+    if (!(await precheckFunds(side, esc))) return;
+
+    setBusy(true, null, 'Sealing…');
     // STRONG salt, then persist the order record BEFORE any broadcast so the
     // reveal data can never be lost (losing it = losing the bond).
     const salt = crypto.getRandomValues(new Uint8Array(32));
@@ -1699,14 +1861,13 @@ async function seal() {
     const epoch = MSTATE.epoch;
     const order = orderPda(MKT.market, epoch, owner, idx);
     const hash = await commitHash(side, size, limit, salt, owner);
-    const esc = requiredEscrow(side, size, limit);
     const escrowFrom = getAssociatedTokenAddressSync(new PublicKey(side === 1 ? MSTATE.baseMint : MSTATE.quoteMint), owner);
     const escrowVault = side === 1 ? MKT.base_pool : MKT.quote_pool;
-    const rec = {
+    rec = {
       id: order.toString(), market: MKT.market.toString(), epoch: epoch.toString(),
       idx, side, size: size.toString(), limit: limit.toString(),
       salt: Array.from(salt), commitment: Array.from(hash), escrow: esc.toString(),
-      status: 'committing', createdAt: Date.now(), network: CFG.network,
+      owner: owner.toString(), status: 'committing', createdAt: Date.now(), network: CFG.network,
     };
     persistOrder(rec); // ← atomic custody before broadcast
 
@@ -1720,15 +1881,41 @@ async function seal() {
     updateOrder(rec.id, { status: 'sealed', commitSig: sig });
     banner('Sealed on-chain. Come back after the commit window to reveal — we\'ll remind you.', 'ok');
     $('fSize').value = ''; $('fLimit').value = ''; renderTicket();
-    refresh();
+    await refresh();
   } catch (e) {
-    banner('Seal failed: ' + (e.message || e), 'warn');
+    // Drop the local record ONLY when the tx provably never reached the chain
+    // (wallet declined / preflight failure). Anything ambiguous keeps the
+    // salt — refresh() reconciles it against the chain.
+    if (e.notBroadcast && rec) removeOrders((o) => o.id === rec.id);
+    banner('Seal failed: ' + friendlyErr(e), 'warn');
   } finally { setBusy(false); }
 }
 
+// ── cancel (during commit window: full escrow + bond back) ──
+async function cancelOrder(rec, btn) {
+  if (!wallet) return connect();
+  if (!MKT) return;
+  cardBusy(btn, 'Cancelling…');
+  try {
+    const escrowPool = rec.side === 1 ? MKT.base_pool : MKT.quote_pool;
+    const escrowMint = rec.side === 1 ? MSTATE.baseMint : MSTATE.quoteMint;
+    const ownerToken = getAssociatedTokenAddressSync(new PublicKey(escrowMint), owner);
+    const cIx = await ix('cancel_commit', {
+      market: MKT.market, order: new PublicKey(rec.id), market_auth: MKT.market_auth,
+      bond_vault: MKT.bond_vault, escrow_pool: escrowPool, owner_token: ownerToken,
+      owner, token_program: TOKEN_PROGRAM_ID, system_program: SystemProgram.programId,
+    }, {});
+    const sig = await signSend(new Transaction().add(cIx));
+    updateOrder(rec.id, { status: 'cancelled', cancelSig: sig });
+    banner('Cancelled — escrow and bond returned in full.', 'ok');
+    await refresh();
+  } catch (e) { banner('Cancel failed: ' + friendlyErr(e), 'warn'); refresh(); }
+}
+
 // ── reveal ──
-async function reveal(rec) {
-  setBusy(true, 'Revealing…');
+async function reveal(rec, btn, quiet) {
+  if (!wallet) return connect();
+  cardBusy(btn, 'Revealing…');
   try {
     const revealIx = await ix('reveal', {
       venue: MKT.venue, market: MKT.market, bond_vault: MKT.bond_vault,
@@ -1736,15 +1923,39 @@ async function reveal(rec) {
     }, { side: rec.side, size: rec.size, limit_px: rec.limit, salt: rec.salt });
     const sig = await signSend(new Transaction().add(revealIx));
     updateOrder(rec.id, { status: 'revealed', revealSig: sig });
-    banner('Revealed — your bond is back. You\'ll be filled at the batch\'s one price, or refunded.', 'ok');
-    refresh();
-  } catch (e) { banner('Reveal failed: ' + (e.message || e), 'warn'); }
-  finally { setBusy(false); }
+    if (!quiet) banner('Revealed — your bond is back. You\'ll be filled at the batch\'s one price, or refunded.', 'ok');
+    await refresh();
+    return true;
+  } catch (e) { banner('Reveal failed: ' + friendlyErr(e), 'warn'); refresh(); return false; }
+}
+async function revealAll() {
+  const list = myOrders().filter((o) => o.status === 'sealed' && MSTATE && o.epoch === MSTATE.epoch.toString() && (!o.owner || o.owner === owner?.toString()));
+  if (!list.length) return;
+  const b = $('gBtn'); b.disabled = true; b.innerHTML = '<span class="spin"></span>Revealing…';
+  let ok = 0;
+  for (const rec of list) { if (await reveal(rec, null, true)) ok++; }
+  b.disabled = false;
+  if (ok) banner('Revealed ' + ok + ' order' + (ok > 1 ? 's' : '') + ' — your bond is back. You\'ll be filled at the batch\'s one price, or refunded.', 'ok');
 }
 
-// ── settle ──
-async function settle(rec) {
-  setBusy(true, 'Settling…');
+// ── settle (+ receipt: exactly what moved, computed from chain state) ──
+function buildReceipt(rec, o, m) {
+  if (m.failed || !o.revealed) return { kind: 'refund', escrow: o.escrowAmount.toString(), escrowMint: rec.side === 1 ? 'base' : 'quote' };
+  const fill = o.fillBase, pStar = m.pStar;
+  const gross = (fill * pStar) / P1;
+  const fee = (gross * FEE_BPS) / 10_000n;
+  if (o.side === 1) return {
+    kind: 'sell', fill: fill.toString(), size: o.size.toString(), pStar: pStar.toString(),
+    fee: fee.toString(), quoteOut: (gross - fee).toString(), baseBack: (o.escrowAmount - fill).toString(),
+  };
+  return {
+    kind: 'buy', fill: fill.toString(), size: o.size.toString(), pStar: pStar.toString(),
+    fee: fee.toString(), baseOut: fill.toString(), quoteBack: (o.escrowAmount - gross - fee).toString(),
+  };
+}
+async function settle(rec, btn) {
+  if (!wallet) return connect();
+  cardBusy(btn, 'Settling…');
   try {
     const ownerBase = getAssociatedTokenAddressSync(new PublicKey(MSTATE.baseMint), owner);
     const ownerQuote = getAssociatedTokenAddressSync(new PublicKey(MSTATE.quoteMint), owner);
@@ -1755,95 +1966,276 @@ async function settle(rec) {
       token_program: TOKEN_PROGRAM_ID,
     }, {});
     const sig = await signSend(new Transaction().add(settleIx));
-    updateOrder(rec.id, { status: 'settled', settleSig: sig });
+    let receipt = null;
+    try {
+      const [oi, mi] = await Promise.all([conn.getAccountInfo(new PublicKey(rec.id)), conn.getAccountInfo(MKT.market)]);
+      if (oi && mi) receipt = buildReceipt(rec, parseOrder(oi.data), parseMarket(mi.data));
+    } catch { /* receipt is a bonus; settlement already confirmed */ }
+    updateOrder(rec.id, { status: 'settled', settleSig: sig, receipt });
     banner('Settled. Funds are in your wallet.', 'ok');
-    refresh();
-  } catch (e) { banner('Settle failed: ' + (e.message || e), 'warn'); }
-  finally { setBusy(false); }
+    await refresh();
+  } catch (e) { banner('Settle failed: ' + friendlyErr(e), 'warn'); refresh(); }
 }
 
 // ── render ──
 function fmtT(unix) { return new Date(unix * 1000).toLocaleString(); }
+let BUSY = false, refreshing = false, lastPhase = null;
 async function refresh() {
-  const st = await loadMarket();
-  if (!st) {
-    $('phaseTag').textContent = 'preview';
-    banner(CFG.network === 'mainnet-beta'
-      ? 'The venue is not yet live on mainnet — the security audit is in progress. This interface is the real client; it goes live the day the audited program deploys.'
-      : 'No market found on this cluster yet.', 'info', true);
-    $('sealBtn').disabled = true;
-    $('sealBtn').textContent = 'Venue not live yet';
-    renderOrders(0);
-    return;
-  }
-  const now = await chainNow();
-  const { commitCut, revealCut } = phaseTimes(st);
-  const phase = st.cleared ? 'cleared' : st.failed ? 'failed' : now < commitCut ? 'commit' : now < revealCut ? 'reveal' : 'clearing';
-  $('phaseTag').textContent = phase;
-  $('mMkt').textContent = short(MKT.market) + '  ·  base ' + short(st.baseMint);
-  $('mCommit').textContent = fmtT(commitCut);
-  $('mReveal').textContent = fmtT(revealCut);
-  $('mRef').textContent = fmtN(st.refPrice.toString());
-  $('mBand').textContent = '±' + (st.bandBps / 100) + '%';
-  $('sizeHint').textContent = side === 1 ? 'base units to sell' : 'base units to buy';
-  const canSeal = wallet && phase === 'commit';
-  $('sealBtn').disabled = !canSeal;
-  $('sealBtn').textContent = !wallet ? 'Connect a wallet to seal' : phase === 'commit' ? (side === 1 ? 'Seal sell order' : 'Seal buy order') : 'Commit window closed';
-  renderTicket();
-  renderOrders(now);
+  if (refreshing) return; refreshing = true;
+  try {
+    let st;
+    try { st = await loadMarket(); } catch (e) { rpcTrouble(e); return; }
+    if (!st) {
+      $('phaseTag').textContent = 'preview';
+      banner(CFG.network === 'mainnet-beta'
+        ? 'The venue is not yet live on mainnet — the security audit is in progress. This interface is the real client; it goes live the day the audited program deploys.'
+        : 'No market found on this cluster yet.', 'info', true);
+      $('sealBtn').disabled = true;
+      $('sealBtn').textContent = 'Venue not live yet';
+      renderTimeline(null);
+      renderOrders(0);
+      renderGuardian();
+      return;
+    }
+    let now;
+    try { now = await chainNow(); } catch (e) { rpcTrouble(e); return; }
+    chainOff = now - Date.now() / 1000;
+    checkNetwork();
+    await reconcileCommitting();
+    const { commitCut, revealCut } = phaseTimes(st);
+    const phase = st.cleared ? 'cleared' : st.failed ? 'failed' : now < commitCut ? 'commit' : now < revealCut ? 'reveal' : 'clearing';
+    lastPhase = phase;
+    $('phaseTag').textContent = phase === 'cleared' ? 'settle' : phase === 'failed' ? 'no cross' : phase;
+    renderTimeline(phase);
+    $('mMkt').textContent = short(MKT.market) + '  ·  base ' + short(st.baseMint);
+    $('mCommit').textContent = fmtT(commitCut);
+    $('mReveal').textContent = fmtT(revealCut);
+    $('mRef').textContent = fmtN(st.refPrice.toString());
+    $('mBand').textContent = '±' + (st.bandBps / 100) + '%';
+    $('sizeHint').textContent = side === 1 ? 'base units to sell' : 'base units to buy';
+    if (!BUSY) {
+      const canSeal = wallet && phase === 'commit';
+      $('sealBtn').disabled = !canSeal;
+      $('sealBtn').textContent = !wallet ? 'Connect a wallet to seal' : phase === 'commit' ? (side === 1 ? 'Seal sell order' : 'Seal buy order') : 'Commit window closed';
+    }
+    renderTicket();
+    renderOrders(now);
+    renderGuardian();
+  } finally { refreshing = false; }
 }
-const chainNowSafe = async () => { try { return await chainNow(); } catch { return Math.floor(Date.now() / 1000); } };
+// A record stuck in 'committing' means we don't know whether the commit
+// landed (e.g. tab closed mid-broadcast). Ask the chain: promote it if the
+// order account exists, or flag it dismissable if it never appeared.
+async function reconcileCommitting() {
+  for (const o of myOrders().filter((x) => x.status === 'committing')) {
+    try {
+      const info = await conn.getAccountInfo(new PublicKey(o.id));
+      if (info) { const po = parseOrder(info.data); updateOrder(o.id, { status: po.settled ? 'settled' : po.revealed ? 'revealed' : 'sealed' }); }
+      else if (Date.now() - o.createdAt > 90_000) updateOrder(o.id, { stale: true });
+    } catch { /* keep the record; try again next refresh */ }
+  }
+}
+function rpcTrouble(e) {
+  $('phaseTag').textContent = 'offline';
+  banner('Can\'t reach the RPC endpoint — ' + friendlyErr(e) + ' Your sealed orders are safe on this device.', 'warn', true, 'Retry', () => { banner('Reconnecting…', 'info'); refresh(); });
+  $('sealBtn').disabled = true;
+  $('sealBtn').textContent = 'RPC unreachable';
+}
+function renderTimeline(phase) {
+  const idx = { commit: 0, reveal: 1, clearing: 2, cleared: 3, failed: 2 }[phase];
+  document.querySelectorAll('#timeline .tls').forEach((el) => {
+    const s = Number(el.dataset.s);
+    el.classList.remove('done', 'on', 'warn');
+    if (idx === undefined) return;
+    if (phase === 'failed' && s >= 2) { el.classList.add('warn'); if (s === 2) el.textContent = 'No cross'; return; }
+    if (s === 2) el.textContent = 'Clear';
+    if (s < idx) el.classList.add('done');
+    else if (s === idx) el.classList.add('on');
+  });
+}
 
 function renderOrders(now) {
-  const mine = loadOrders().filter((o) => o.network === CFG.network && (!MKT || o.market === MKT.market.toString()));
+  const mine = myOrders();
   $('ordCount').textContent = mine.length;
+  const finished = mine.some((o) => ['settled', 'cancelled'].includes(o.status));
+  $('clrFin').style.display = finished ? '' : 'none';
   const el = $('orders');
   if (!mine.length) { el.innerHTML = '<div class="empty">No sealed orders yet. Seal one on the left — it\'s saved to this device so you can always reveal it.</div>'; return; }
   el.innerHTML = mine.map((o) => orderCard(o, now)).join('');
-  el.querySelectorAll('[data-reveal]').forEach((b) => b.onclick = () => reveal(mine.find((x) => x.id === b.dataset.reveal)));
-  el.querySelectorAll('[data-settle]').forEach((b) => b.onclick = () => settle(mine.find((x) => x.id === b.dataset.settle)));
+  el.querySelectorAll('[data-reveal]').forEach((b) => b.onclick = () => reveal(mine.find((x) => x.id === b.dataset.reveal), b));
+  el.querySelectorAll('[data-settle]').forEach((b) => b.onclick = () => settle(mine.find((x) => x.id === b.dataset.settle), b));
+  el.querySelectorAll('[data-cancel]').forEach((b) => b.onclick = () => cancelOrder(mine.find((x) => x.id === b.dataset.cancel), b));
+  el.querySelectorAll('[data-dismiss]').forEach((b) => b.onclick = () => { removeOrders((x) => x.id === b.dataset.dismiss); refresh(); });
 }
 function orderCard(o, now) {
   const sideLbl = o.side === 1 ? 'SELL' : 'BUY';
+  const foreign = o.owner && owner && o.owner !== owner.toString();
   let action = '', countdown = '';
-  if (MSTATE && o.epoch === MSTATE.epoch.toString()) {
+  if (MSTATE && o.epoch === MSTATE.epoch.toString() && !foreign) {
     const { commitCut, revealCut } = phaseTimes(MSTATE);
-    if (o.status === 'sealed' && now < commitCut) countdown = 'Reveal opens in ' + dur(commitCut - now);
-    else if (o.status === 'sealed' && now >= commitCut && now < revealCut) { action = '<button class="btn-primary sm" data-reveal="' + o.id + '">Reveal now</button>'; countdown = '<span class="urgent">Reveal window closes in ' + dur(revealCut - now) + '</span>'; }
+    if (o.status === 'sealed' && now < commitCut) {
+      countdown = 'Reveal opens in <span class="mono" data-cd="' + commitCut + '">' + dur(commitCut - now) + '</span>';
+      action = '<button class="btn-ghost" data-cancel="' + o.id + '">Cancel — full refund</button>';
+    }
+    else if (o.status === 'sealed' && now >= commitCut && now < revealCut) { action = '<button class="btn-primary sm" data-reveal="' + o.id + '">Reveal now</button>'; countdown = '<span class="urgent">Reveal window closes in <span class="mono" data-cd="' + revealCut + '">' + dur(revealCut - now) + '</span></span>'; }
     else if (o.status === 'sealed' && now >= revealCut) countdown = '<span class="urgent">Reveal window missed — bond forfeit, escrow refundable</span>';
     else if (o.status === 'revealed' && (MSTATE.cleared || MSTATE.failed)) action = '<button class="btn-primary sm" data-settle="' + o.id + '">Settle &amp; withdraw</button>';
     else if (o.status === 'revealed') countdown = 'Revealed — waiting for the batch to clear';
+  } else if (MSTATE && o.epoch !== MSTATE.epoch.toString() && !['settled', 'cancelled'].includes(o.status)) {
+    countdown = 'From a previous epoch (' + o.epoch + ')';
   }
-  const badge = { committing: 'sealing', sealed: 'sealed', revealed: 'revealed', settled: 'settled' }[o.status] || o.status;
+  if (foreign) countdown = 'Sealed by ' + o.owner.slice(0, 4) + '…' + o.owner.slice(-4) + ' — connect that wallet to act';
+  if (o.status === 'cancelled') countdown = 'Cancelled — escrow and bond returned in full';
+  if (o.status === 'committing') {
+    if (o.stale) { countdown = '<span class="urgent">Never confirmed on chain — if your wallet history shows no seal transaction, dismiss this</span>'; action = '<button class="btn-ghost" data-dismiss="' + o.id + '">Dismiss</button>'; }
+    else countdown = 'Sealing — waiting for confirmation';
+  }
+  const badge = { committing: 'sealing', sealed: 'sealed', revealed: 'revealed', settled: 'settled', cancelled: 'cancelled' }[o.status] || o.status;
   return '<div class="oc"><div class="oc-top"><span class="pill s' + o.side + '">' + sideLbl + '</span>' +
     '<span class="oc-amt mono">' + fmtN(o.size) + ' @ ' + fmtN(o.limit) + '</span>' +
     '<span class="oc-badge">' + badge + '</span></div>' +
     (countdown ? '<div class="oc-cd">' + countdown + '</div>' : '') +
+    receiptHtml(o) +
     (o.commitSig ? '<div class="oc-sig mono">' + short2(o.commitSig) + explorer(o.commitSig) + '</div>' : '') +
     (action ? '<div class="oc-act">' + action + '</div>' : '') + '</div>';
+}
+function receiptHtml(o) {
+  const r = o.receipt;
+  if (o.status !== 'settled' || !r) return '';
+  let rows = '';
+  if (r.kind === 'refund') rows = row('Batch did not cross', 'full refund') + row('Escrow returned', fmtN(r.escrow) + ' ' + r.escrowMint);
+  else if (r.kind === 'sell') rows =
+    row('Filled', fmtN(r.fill) + ' / ' + fmtN(r.size) + ' base') +
+    row('Clearing price', fmtN(r.pStar)) +
+    row('Fee paid (0.75%)', fmtN(r.fee) + ' quote') +
+    row('Received', fmtN(r.quoteOut) + ' quote') +
+    (r.baseBack !== '0' ? row('Unsold base returned', fmtN(r.baseBack)) : '');
+  else rows =
+    row('Filled', fmtN(r.fill) + ' / ' + fmtN(r.size) + ' base') +
+    row('Clearing price', fmtN(r.pStar)) +
+    row('Fee paid (0.75%)', fmtN(r.fee) + ' quote') +
+    row('Received', fmtN(r.baseOut) + ' base') +
+    (r.quoteBack !== '0' ? row('Unspent quote returned', fmtN(r.quoteBack)) : '');
+  return '<div class="rcpt"><div class="rcpt-h">Settlement receipt</div>' + rows + '</div>';
 }
 function dur(s) { s = Math.max(0, s | 0); const h = s / 3600 | 0, m = (s % 3600) / 60 | 0, sec = s % 60; return h ? h + 'h ' + m + 'm' : m ? m + 'm ' + sec + 's' : sec + 's'; }
 const short = (pk) => { const s = pk.toString(); return s.slice(0, 4) + '…' + s.slice(-4); };
 const short2 = (s) => s.slice(0, 8) + '…' + s.slice(-6);
 const explorer = (sig) => CFG.network === 'mainnet-beta' ? ' <a href="https://solscan.io/tx/' + sig + '" target="_blank" rel="noopener">↗</a>' : ' <a href="https://explorer.solana.com/tx/' + sig + '?cluster=' + (CFG.network || 'devnet') + '" target="_blank" rel="noopener">↗</a>';
 
+// ── REVEAL GUARDIAN: never let a reveal window pass unnoticed ──
+const BASE_TITLE = document.title;
+let gMode = null;
+function guardianOrders() {
+  return MSTATE ? myOrders().filter((o) => o.status === 'sealed' && o.epoch === MSTATE.epoch.toString()) : [];
+}
+function renderGuardian() {
+  const g = $('guardian'); if (!g) return;
+  const sealed = guardianOrders();
+  if (!MSTATE || !sealed.length) { g.className = 'guard'; gMode = null; document.title = BASE_TITLE; return; }
+  const now = lnow();
+  const { commitCut, revealCut } = phaseTimes(MSTATE);
+  const n = sealed.length, plural = n > 1 ? 's' : '';
+  const btn = $('gBtn');
+  if (now < commitCut) {
+    g.className = 'guard show'; gMode = 'waiting';
+    $('gTitle').textContent = n + ' sealed order' + plural + ' waiting to reveal';
+    $('gSub').textContent = notifGranted()
+      ? 'Reveal opens when the commit window closes — you\'ll get a notification here. A missed reveal forfeits the 0.25 SOL bond; escrow always returns.'
+      : 'Reveal opens when the commit window closes. Keep this page reachable — a missed reveal forfeits the 0.25 SOL bond; escrow always returns.';
+    $('gCd').textContent = dur(commitCut - now);
+    if (notifAskable()) { btn.style.display = ''; btn.textContent = 'Notify me'; } else btn.style.display = 'none';
+    document.title = BASE_TITLE;
+  } else if (now < revealCut) {
+    g.className = 'guard show open'; gMode = 'open';
+    $('gTitle').textContent = 'Reveal window is OPEN — reveal now to reclaim your bond' + (n > 1 ? 's' : '');
+    $('gSub').textContent = n + ' sealed order' + plural + ' must be revealed before the window closes.';
+    $('gCd').textContent = dur(revealCut - now);
+    btn.style.display = '';
+    if (!btn.disabled) btn.textContent = wallet ? 'Reveal all (' + n + ')' : 'Connect wallet to reveal';
+    document.title = 'REVEAL OPEN — ' + BASE_TITLE;
+    maybeNotify(sealed, revealCut - now);
+  } else {
+    g.className = 'guard show missed'; gMode = 'missed';
+    $('gTitle').textContent = 'Reveal window closed with ' + n + ' unrevealed order' + plural;
+    $('gSub').textContent = 'The 0.25 SOL bond is forfeit, but your escrow is safe — settle after the batch resolves for a full escrow refund.';
+    $('gCd').textContent = '';
+    btn.style.display = 'none';
+    document.title = BASE_TITLE;
+  }
+}
+function notifGranted() { return 'Notification' in window && Notification.permission === 'granted'; }
+function notifAskable() { return 'Notification' in window && Notification.permission === 'default'; }
+function maybeNotify(sealed, secsLeft) {
+  if (!notifGranted()) return;
+  for (const o of sealed) {
+    if (o.notified) continue;
+    updateOrder(o.id, { notified: true });
+    try {
+      new Notification('ICEBERG — reveal window open', {
+        body: 'A sealed order needs its reveal within ' + dur(secsLeft) + ' or the 0.25 SOL bond is forfeit. Open the venue and press Reveal.',
+        tag: 'iceberg-reveal-' + o.id,
+      });
+    } catch { }
+  }
+}
+function guardianAction() {
+  if (gMode === 'waiting' && notifAskable()) {
+    Notification.requestPermission().then(() => renderGuardian());
+    return;
+  }
+  if (gMode === 'open') { if (!wallet) connect(); else revealAll(); }
+}
+
+// 1 s ticker: pure-local countdowns + phase-flip detection (no RPC).
+setInterval(() => {
+  if (document.hidden || BUSY) return;
+  const now = lnow();
+  document.querySelectorAll('[data-cd]').forEach((el) => { el.textContent = dur(Number(el.dataset.cd) - now); });
+  if (MSTATE) {
+    const { commitCut, revealCut } = phaseTimes(MSTATE);
+    const phase = MSTATE.cleared ? 'cleared' : MSTATE.failed ? 'failed' : now < commitCut ? 'commit' : now < revealCut ? 'reveal' : 'clearing';
+    if (lastPhase && phase !== lastPhase) refresh(); // e.g. commit→reveal: pull fresh chain state
+  }
+  renderGuardian();
+}, 1000);
+
 // ── ui helpers ──
-function banner(msg, kind, sticky) { const b = $('banner'); b.className = 'banner show ' + kind; b.textContent = msg; if (!sticky) setTimeout(() => { if (b.textContent === msg) b.className = 'banner'; }, 9000); }
-function setBusy(on, msg) { $('sealBtn').disabled = on || !wallet; if (on && msg) banner(msg, 'info'); }
+let bannerAction = null;
+function banner(msg, kind, sticky, actionLabel, actionFn) {
+  const b = $('banner'); b.className = 'banner show ' + kind; b.textContent = msg;
+  if (actionLabel && actionFn) {
+    bannerAction = actionFn;
+    const btn = document.createElement('button'); btn.textContent = actionLabel;
+    btn.onclick = () => bannerAction && bannerAction();
+    b.appendChild(btn);
+  }
+  if (!sticky) setTimeout(() => { if (b.textContent.startsWith(msg.slice(0, 40))) b.className = 'banner'; }, 9000);
+}
+function setBusy(on, _msg, label) {
+  BUSY = on;
+  const b = $('sealBtn');
+  if (on) { b.disabled = true; b.innerHTML = '<span class="spin"></span>' + (label || 'Working…'); }
+  else { b.disabled = !wallet; b.textContent = 'Seal order'; refresh(); }
+}
+function cardBusy(btn, label) { if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>' + label; } }
 $('netPill').textContent = CFG.network;
 $('netPill').className = 'netpill ' + (CFG.network === 'mainnet-beta' ? 'main' : 'test');
 
 // ── wire up ──
 $('connect').onclick = connect;
 $('sealBtn').onclick = seal;
+$('gBtn').onclick = guardianAction;
+$('clrFin').onclick = () => { removeOrders((o) => o.network === CFG.network && ['settled', 'cancelled'].includes(o.status)); refresh(); };
 document.querySelectorAll('#sideSeg button').forEach((b) => b.onclick = () => {
   document.querySelectorAll('#sideSeg button').forEach((x) => x.classList.remove('on'));
   b.classList.add('on'); side = Number(b.dataset.side); refresh();
 });
 ['fSize', 'fLimit'].forEach((id) => $(id).addEventListener('input', renderTicket));
-if (provider()?.isConnected && provider()?.publicKey) { wallet = provider(); owner = provider().publicKey; $('connect').textContent = short(owner); }
+if (provider()?.isConnected && provider()?.publicKey) setWallet(provider(), provider().publicKey);
 refresh();
-setInterval(() => { if (!document.hidden) refresh(); }, 5000); // live phase countdowns
+setInterval(() => { if (!document.hidden && !BUSY) refresh(); }, 5000); // live chain state
 window.__ICEBERG_READY = true;
-
 </script>
+</body>
+</html>
