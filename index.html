@@ -665,12 +665,7 @@
 
 
   // Phantom (or any injected Solana wallet) — READ-ONLY: we only look up balances.
-  const RPC = 'https://api.mainnet-beta.solana.com';
-  async function rpc(method, params) {
-    const r = await fetch(RPC, { method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }) });
-    return (await r.json()).result;
-  }
+  // Balances via Jupiter's lite API (keyless + browser-safe); public Solana RPCs 403 browser calls.
   $id('wConnect').addEventListener('click', async () => {
     const prov = window.phantom?.solana || window.solana;
     if (!prov) { $id('simNote').textContent = 'No Solana wallet found — presets work without one'; return; }
@@ -679,12 +674,10 @@
       const res = await prov.connect();
       const owner = res.publicKey.toString();
       $id('wConnect').textContent = 'Reading your holdings…';
-      const toks = await rpc('getTokenAccountsByOwner', [owner,
-        { programId: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA' }, { encoding: 'jsonParsed' }]);
-      const bals = (toks?.value || []).map((a) => {
-        const i = a.account.data.parsed.info;
-        return { mint: i.mint, amt: Number(i.tokenAmount.uiAmount || 0) };
-      }).filter((x) => x.amt > 0);
+      const bal = await (await fetch('https://lite-api.jup.ag/ultra/v1/balances/' + owner)).json();
+      const bals = Object.entries(bal || {})
+        .filter(([mint, v]) => mint !== 'SOL' && Number(v?.uiAmount || 0) > 0)
+        .map(([mint, v]) => ({ mint, amt: Number(v.uiAmount) }));
       const mints = bals.map((b) => b.mint).slice(0, 60);
       const holdings = [];
       for (let i = 0; i < mints.length; i += 30) {
