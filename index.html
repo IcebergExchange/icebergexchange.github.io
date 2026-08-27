@@ -15,17 +15,10 @@
 
   /* ──────────────────────── tokens ──────────────────────── */
   :root{
-    --abyss:#04070d;          /* page ground        */
-    --deep:#060b14;           /* section ground     */
-    --water:#0a1524;          /* raised surface     */
-    --surface:#0e1c2f;        /* card surface       */
-    --ice:#eaf4fb;            /* primary ink        */
-    --ice-dim:#a3bdd1;        /* secondary ink      */
-    --ice-faint:#5e7891;      /* muted ink          */
-    --glow:#59c7ff;           /* accent             */
-    --glow-deep:#1f83c6;
-    --hairline:rgba(163,199,232,.10);
-    --hairline-strong:rgba(163,199,232,.18);
+    --abyss:#04070d;--deep:#060b14;--water:#0a1524;--surface:#0e1c2f;
+    --ice:#eaf4fb;--ice-dim:#a3bdd1;--ice-faint:#5e7891;
+    --glow:#59c7ff;--glow-deep:#1f83c6;--mint:#7ce8ba;--coral:#ff8a97;
+    --hairline:rgba(163,199,232,.10);--hairline-strong:rgba(163,199,232,.18);
     --r-lg:22px;--r-md:16px;--r-sm:11px;
     --shadow-card:0 1px 0 rgba(255,255,255,.03) inset,0 24px 70px rgba(0,0,0,.45);
     --ease:cubic-bezier(.22,.9,.28,1);
@@ -43,6 +36,7 @@
   ::selection{background:rgba(89,199,255,.28);color:var(--ice)}
   a{color:inherit}
   .wrap{max-width:1060px;margin:0 auto;padding:0 28px}
+  .mono{font-variant-numeric:tabular-nums;letter-spacing:-.01em}
 
   /* ─────────────────── scroll reveal ─────────────────── */
   .rv{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
@@ -51,7 +45,7 @@
   @media(prefers-reduced-motion:reduce){
     .rv{opacity:1;transform:none;transition:none}
     html{scroll-behavior:auto}
-    .waterline-dash{animation:none !important}
+    .waterline-dash,.berg-float,.caustic,.od{animation:none !important}
   }
 
   /* ─────────────────────── nav ─────────────────────── */
@@ -67,30 +61,24 @@
   @media(max-width:720px){.navlinks a:not(.nav-cta){display:none}}
 
   /* ─────────────────────── hero ─────────────────────── */
-  .hero{position:relative;padding:172px 0 0;text-align:center;isolation:isolate}
-  .hero::before{ /* atmospheric ground */
+  .hero{position:relative;padding:158px 0 0;text-align:center;isolation:isolate}
+  .hero::before{
     content:"";position:absolute;inset:-40% -20% auto;height:130%;z-index:-1;pointer-events:none;
     background:
-      radial-gradient(52% 42% at 50% 18%,rgba(38,120,190,.20),transparent 68%),
-      radial-gradient(38% 30% at 78% 6%,rgba(89,199,255,.07),transparent 70%),
-      radial-gradient(30% 26% at 22% 10%,rgba(31,131,198,.08),transparent 70%);
+      radial-gradient(52% 42% at 50% 18%,rgba(38,120,190,.22),transparent 68%),
+      radial-gradient(38% 30% at 78% 6%,rgba(89,199,255,.08),transparent 70%),
+      radial-gradient(30% 26% at 22% 10%,rgba(31,131,198,.09),transparent 70%);
   }
-  .hero::after{ /* fine grain so gradients never band */
+  .hero::after{
     content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.5;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .02 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  h1{
-    font-size:clamp(2.9rem,7.2vw,5.1rem);line-height:1.015;letter-spacing:-.042em;font-weight:640;
-    font-feature-settings:"cv11","ss01";
-  }
-  h1 .dim{
-    background:linear-gradient(180deg,#b7d7ec 4%,#48607a 96%);
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-  }
+  h1{font-size:clamp(2.9rem,7.2vw,5.1rem);line-height:1.015;letter-spacing:-.042em;font-weight:640}
+  h1 .dim{background:linear-gradient(92deg,#8fd8ff 0%,#59c7ff 40%,#2a7fc0 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
   .sub{max-width:585px;margin:26px auto 0;color:var(--ice-dim);font-size:clamp(1.02rem,2.2vw,1.19rem);line-height:1.62;font-weight:420}
   .sub b{color:var(--ice);font-weight:540}
-  .cta-row{margin:40px 0 0;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-  .btn{position:relative;display:inline-flex;align-items:center;gap:9px;padding:14px 30px;border-radius:999px;font-weight:580;font-size:15px;text-decoration:none;letter-spacing:-.006em;transition:transform .18s var(--ease),box-shadow .18s,border-color .18s,background .18s}
+  .cta-row{margin:38px 0 0;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{position:relative;display:inline-flex;align-items:center;gap:9px;padding:14px 30px;border-radius:999px;font-weight:580;font-size:15px;text-decoration:none;letter-spacing:-.006em;transition:transform .18s var(--ease),box-shadow .18s,border-color .18s,background .18s;cursor:pointer;border:0;font-family:inherit}
   .btn svg{transition:transform .18s var(--ease)}
   .btn:hover svg{transform:translateX(3px)}
   .btn-primary{background:linear-gradient(180deg,#6fd2ff,#2b95d8);color:#04121f;box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 10px 34px rgba(77,195,255,.28)}
@@ -98,14 +86,48 @@
   .btn-ghost{border:1px solid var(--hairline-strong);color:var(--ice-dim);background:rgba(163,199,232,.03)}
   .btn-ghost:hover{color:var(--ice);border-color:rgba(163,199,232,.34);background:rgba(163,199,232,.06)}
 
-  /* hero iceberg scene */
-  .scene{position:relative;margin:74px auto -2px;width:min(760px,94%)}
-  .scene .halo{position:absolute;left:50%;top:26%;width:70%;height:56%;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(89,199,255,.13),transparent 70%);pointer-events:none}
+  /* ─────────── exit simulator (hero widget) ─────────── */
+  .sim{position:relative;max-width:780px;margin:56px auto 0;border-radius:24px;padding:1px;text-align:left;
+    background:linear-gradient(165deg,rgba(89,199,255,.35),rgba(89,199,255,.05) 35%,rgba(89,199,255,.05) 65%,rgba(31,131,198,.3))}
+  .sim-in{border-radius:23px;background:linear-gradient(180deg,rgba(14,28,47,.92),rgba(7,14,25,.96));backdrop-filter:blur(10px);padding:26px 28px 22px;box-shadow:var(--shadow-card)}
+  .sim-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+  .sim-title{font-size:12px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;color:var(--glow);display:flex;align-items:center;gap:9px}
+  .sim-note{font-size:11.5px;color:var(--ice-faint)}
+  .sim-controls{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:640px){.sim-controls{grid-template-columns:1fr}}
+  .field label{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice-faint);font-weight:560;margin-bottom:8px}
+  .seg{display:flex;background:rgba(4,10,18,.7);border:1px solid var(--hairline);border-radius:12px;padding:4px;gap:4px}
+  .seg button{flex:1;border:0;background:transparent;color:var(--ice-dim);font-family:inherit;font-size:13.5px;font-weight:540;padding:9px 4px;border-radius:9px;cursor:pointer;transition:background .2s,color .2s}
+  .seg button.on{background:linear-gradient(180deg,rgba(89,199,255,.22),rgba(89,199,255,.1));color:var(--ice);box-shadow:0 1px 0 rgba(255,255,255,.06) inset}
+  .sim-out{margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:640px){.sim-out{grid-template-columns:1fr}}
+  .out-card{border-radius:16px;padding:18px 20px;border:1px solid var(--hairline)}
+  .out-card .lab{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:580;margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  .out-card .big{font-size:clamp(1.5rem,3.4vw,1.95rem);font-weight:630;letter-spacing:-.03em;line-height:1.1}
+  .out-card .fine{margin-top:7px;font-size:12.5px;color:var(--ice-faint);line-height:1.5}
+  .out-market{background:linear-gradient(180deg,rgba(64,18,26,.35),rgba(20,8,12,.2))}
+  .out-market .lab{color:var(--coral)}
+  .out-market .big{color:var(--coral)}
+  .out-ice{background:linear-gradient(180deg,rgba(10,44,36,.4),rgba(6,18,16,.2))}
+  .out-ice .lab{color:var(--mint)}
+  .out-ice .big{color:var(--mint)}
+  .sim-delta{margin-top:14px;text-align:center;font-size:13.5px;color:var(--ice-dim)}
+  .sim-delta b{color:var(--mint);font-weight:600}
+  .sim-foot{margin-top:12px;text-align:center;font-size:11px;color:var(--ice-faint)}
+
+  /* hero iceberg scene — glossy 3D set piece */
+  .scene{position:relative;margin:70px auto -2px;width:min(780px,94%)}
+  .scene .halo{position:absolute;left:50%;top:22%;width:76%;height:60%;transform:translateX(-50%);background:radial-gradient(50% 50% at 50% 50%,rgba(89,199,255,.15),transparent 70%);pointer-events:none}
   .berg{display:block;width:100%}
+  .berg-float{animation:bob 9s ease-in-out infinite;transform-origin:340px 150px}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(0.001deg)}50%{transform:translateY(-7px) rotate(-.35deg)}}
   .waterline-dash{animation:drift 26s linear infinite}
   @keyframes drift{to{stroke-dashoffset:-200}}
+  .caustic{animation:shimmer 7s ease-in-out infinite;opacity:.5}
+  .caustic.c2{animation-delay:-3.4s}
+  @keyframes shimmer{0%,100%{opacity:.22}50%{opacity:.6}}
 
-  /* fact strip — mechanism facts, never fabricated numbers */
+  /* fact strip */
   .facts{border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);background:linear-gradient(180deg,rgba(10,21,36,.5),rgba(10,21,36,0))}
   .facts-in{max-width:1060px;margin:0 auto;padding:26px 28px;display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
   @media(max-width:720px){.facts-in{grid-template-columns:1fr;gap:14px}}
@@ -132,20 +154,44 @@
   .player-note a{color:var(--ice-dim);text-decoration:none;border-bottom:1px solid var(--hairline-strong)}
   .player-note a:hover{color:var(--ice)}
 
-  /* problem — editorial numbered rows */
+  /* venue preview — app window */
+  .appwin{position:relative;max-width:900px;margin:50px auto 0;border-radius:20px;padding:1px;
+    background:linear-gradient(170deg,rgba(89,199,255,.3),rgba(89,199,255,.04) 40%,rgba(31,131,198,.24));perspective:1400px}
+  .appwin-in{border-radius:19px;background:linear-gradient(180deg,#0b1728,#070f1c);box-shadow:var(--shadow-card),0 60px 140px rgba(0,0,0,.55);overflow:hidden}
+  .appbar{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid var(--hairline)}
+  .appbar .wdot{width:10px;height:10px;border-radius:50%;background:rgba(163,199,232,.16)}
+  .appbar .url{margin-left:12px;font-size:11.5px;color:var(--ice-faint);letter-spacing:.06em;background:rgba(4,10,18,.6);border:1px solid var(--hairline);border-radius:8px;padding:4px 12px}
+  .appbody{display:grid;grid-template-columns:190px 1fr;min-height:340px}
+  @media(max-width:700px){.appbody{grid-template-columns:1fr}.appside{display:none}}
+  .appside{border-right:1px solid var(--hairline);padding:18px 14px;text-align:left}
+  .appside .si{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ice-faint);padding:9px 12px;border-radius:9px;margin-bottom:2px}
+  .appside .si.on{background:rgba(89,199,255,.09);color:var(--ice)}
+  .appmain{padding:26px 28px;text-align:left}
+  .appmain .mhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+  .appmain .mhead b{font-size:16px;font-weight:600;letter-spacing:-.01em}
+  .appmain .phase{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--mint);font-weight:600;display:inline-flex;align-items:center;gap:7px}
+  .phase .pd{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px rgba(124,232,186,.8)}
+  .odgrid{display:grid;grid-template-columns:repeat(16,1fr);gap:7px;margin:6px 0 20px}
+  .od{aspect-ratio:1;border-radius:5px;background:rgba(89,199,255,.14);border:1px solid rgba(89,199,255,.2);animation:odp 3.2s ease-in-out infinite}
+  .od:nth-child(3n){animation-delay:-1.1s}.od:nth-child(5n){animation-delay:-2.2s}.od:nth-child(7n){background:rgba(89,199,255,.22)}
+  @keyframes odp{0%,100%{opacity:.45}50%{opacity:1}}
+  .mrow{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid var(--hairline);font-size:13.5px;color:var(--ice-dim)}
+  .mrow b{color:var(--ice);font-weight:560}
+  .bandbar{position:relative;height:8px;border-radius:99px;background:rgba(4,10,18,.8);border:1px solid var(--hairline);margin:8px 0 2px}
+  .bandbar .bfill{position:absolute;inset:1px 22% 1px 22%;border-radius:99px;background:linear-gradient(90deg,rgba(89,199,255,.15),rgba(89,199,255,.5),rgba(89,199,255,.15))}
+  .bandbar .btick{position:absolute;top:-4px;bottom:-4px;left:50%;width:2px;border-radius:2px;background:var(--mint);box-shadow:0 0 10px rgba(124,232,186,.7)}
+  .preview-note{margin-top:16px;text-align:center;font-size:11.5px;color:var(--ice-faint)}
+
+  /* problem */
   .rows{margin-top:54px}
-  .row{display:grid;grid-template-columns:110px 1fr;gap:26px;padding:34px 0;border-top:1px solid var(--hairline);align-items:start;transition:background .3s}
+  .row{display:grid;grid-template-columns:110px 1fr;gap:26px;padding:34px 0;border-top:1px solid var(--hairline);align-items:start}
   .row:first-child{border-top:none}
-  .row .n{
-    font-size:44px;font-weight:640;letter-spacing:-.04em;line-height:1;
-    background:linear-gradient(180deg,rgba(89,199,255,.85),rgba(89,199,255,.12));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-  }
+  .row .n{font-size:44px;font-weight:640;letter-spacing:-.04em;line-height:1;background:linear-gradient(180deg,rgba(89,199,255,.85),rgba(89,199,255,.12));-webkit-background-clip:text;background-clip:text;color:transparent}
   .row h3{font-size:19px;font-weight:590;letter-spacing:-.014em;margin-bottom:8px}
   .row p{color:var(--ice-dim);font-size:15px;max-width:580px}
   @media(max-width:640px){.row{grid-template-columns:64px 1fr;gap:18px}.row .n{font-size:32px}}
 
-  /* how — depth timeline */
+  /* how */
   .depth{margin-top:56px;position:relative}
   .step{position:relative;margin-left:12px;padding:0 0 50px 42px;border-left:1px solid rgba(89,199,255,.22)}
   .step:last-child{padding-bottom:0;border-left-color:transparent}
@@ -154,7 +200,7 @@
   .step h3{font-size:19.5px;font-weight:600;letter-spacing:-.016em;margin-bottom:8px}
   .step p{color:var(--ice-dim);font-size:15.2px;max-width:580px}
 
-  /* fairness — glass 2×2 grid */
+  /* fairness */
   .fair{margin-top:66px;position:relative;border-radius:var(--r-lg);padding:1px;background:linear-gradient(160deg,rgba(89,199,255,.28),rgba(89,199,255,.03) 38%,rgba(89,199,255,.03) 62%,rgba(31,131,198,.22))}
   .fair-in{border-radius:calc(var(--r-lg) - 1px);background:linear-gradient(180deg,#0d1b2e,#081120);padding:38px 40px 34px;box-shadow:var(--shadow-card)}
   .fair h3{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--glow);font-weight:600;margin-bottom:26px}
@@ -165,7 +211,7 @@
   .fair-item b{display:block;font-weight:570;letter-spacing:-.01em;margin-bottom:3px}
   .fair-item p{color:var(--ice-dim);font-size:14.2px;line-height:1.58}
 
-  /* who — asymmetric cards */
+  /* who */
   .who{margin-top:54px;display:grid;grid-template-columns:1.45fr 1fr 1fr;gap:16px}
   @media(max-width:820px){.who{grid-template-columns:1fr}}
   .who .card{position:relative;background:linear-gradient(180deg,var(--water),#081120);border:1px solid var(--hairline);border-radius:var(--r-lg);padding:30px 28px;transition:transform .25s var(--ease),border-color .25s,box-shadow .25s;overflow:hidden}
@@ -211,10 +257,10 @@
     ICEBERG
   </a>
   <div class="navlinks">
+    <a href="#sim">Simulate</a>
     <a href="#watch">Watch</a>
-    <a href="#problem">The problem</a>
+    <a href="#venue">The venue</a>
     <a href="#how">How it works</a>
-    <a href="#who">Who it's for</a>
     <a class="nav-cta" href="#contact">Request pilot</a>
   </div>
 </div></nav>
@@ -229,10 +275,63 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       <a class="btn btn-ghost" href="#contact">Pilot access</a>
     </div>
+
+    <!-- exit simulator -->
+    <div class="sim rv d3" id="sim">
+      <div class="sim-in">
+        <div class="sim-head">
+          <span class="sim-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>
+            Simulate your exit
+          </span>
+          <span class="sim-note">Constant-product pool math — illustrative, not a quote</span>
+        </div>
+        <div class="sim-controls">
+          <div class="field">
+            <label>Position to sell</label>
+            <div class="seg" id="segSize">
+              <button data-v="50000">$50k</button>
+              <button data-v="210000" class="on">$210k</button>
+              <button data-v="500000">$500k</button>
+              <button data-v="1000000">$1M</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Pool liquidity</label>
+            <div class="seg" id="segPool">
+              <button data-v="250000">Thin $250k</button>
+              <button data-v="1000000" class="on">$1M</button>
+              <button data-v="5000000">Deep $5M</button>
+            </div>
+          </div>
+        </div>
+        <div class="sim-out">
+          <div class="out-card out-market">
+            <div class="lab">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l6 6 4-4 8 8"/><path d="M21 11v6h-6"/></svg>
+              Market sell
+            </div>
+            <div class="big mono" id="mktOut">—</div>
+            <div class="fine" id="mktFine">price impact on the curve + typical sandwich extraction</div>
+          </div>
+          <div class="out-card out-ice">
+            <div class="lab">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l4 5.5h-2.4L18 14H6l4.4-5.5H8z"/><path d="M4 17h16"/></svg>
+              Iceberg sealed batch
+            </div>
+            <div class="big mono" id="iceOut">—</div>
+            <div class="fine">one uniform clearing price inside the band · 0.75% fee — where in the range depends on batch demand</div>
+          </div>
+        </div>
+        <div class="sim-delta" id="delta"></div>
+        <div class="sim-foot">Assumes a standard constant-product pool and ~1.5% sandwich extraction on visible orders. Real outcomes vary — that's why the demo shows a full worked example.</div>
+      </div>
+    </div>
   </div>
+
   <div class="scene rv d3">
     <div class="halo"></div>
-    <svg class="berg" id="berg" viewBox="0 0 680 320" fill="none" aria-label="An iceberg — the visible tip above the waterline, the mass hidden below">
+    <svg class="berg" id="berg" viewBox="0 0 680 340" fill="none" aria-label="An iceberg — the visible tip above the waterline, the mass hidden below">
       <defs>
         <linearGradient id="under" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#2a93d5" stop-opacity=".8"/>
@@ -242,16 +341,32 @@
           <stop offset="0" stop-color="#4dc3ff" stop-opacity=".12"/>
           <stop offset="1" stop-color="#4dc3ff" stop-opacity="0"/>
         </linearGradient>
+        <linearGradient id="faceL" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cfe7f5"/>
+        </linearGradient>
+        <linearGradient id="faceR" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#a8cfe6"/><stop offset="1" stop-color="#7fb4d4"/>
+        </linearGradient>
+        <linearGradient id="faceC" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#f2fafe"/><stop offset="1" stop-color="#c4e0f0"/>
+        </linearGradient>
       </defs>
-      <polygon points="250,152 640,152 560,206 300,196" fill="url(#ray)" opacity=".5"/>
-      <polygon points="40,152 300,152 240,214 90,200" fill="url(#ray)" opacity=".35"/>
-      <polygon points="340,38 392,102 366,102 415,148 340,148" fill="#bcd9ec"/>
-      <polygon points="340,38 288,102 314,102 265,148 340,148" fill="#ffffff"/>
-      <polygon points="340,72 366,108 340,148 314,108" fill="#e9f6fe"/>
+      <g class="berg-float">
+        <polygon points="250,152 640,152 560,206 300,196" fill="url(#ray)" opacity=".5"/>
+        <polygon points="40,152 300,152 240,214 90,200" fill="url(#ray)" opacity=".35"/>
+        <polygon points="340,38 392,102 366,102 415,148 340,148" fill="url(#faceR)"/>
+        <polygon points="340,38 288,102 314,102 265,148 340,148" fill="url(#faceL)"/>
+        <polygon points="340,72 366,108 340,148 314,108" fill="url(#faceC)"/>
+        <polygon points="340,38 352,66 340,84 328,66" fill="#ffffff" opacity=".85"/>
+        <polygon points="250,152 430,152 470,240 380,300 300,286 228,224" fill="url(#under)"/>
+        <polygon points="290,170 340,166 330,208 288,204" fill="#4dc3ff" opacity=".1"/>
+        <polygon points="360,168 412,172 430,222 372,214" fill="#4dc3ff" opacity=".07"/>
+      </g>
       <line class="waterline-dash" x1="20" y1="148" x2="660" y2="148" stroke="#4dc3ff" stroke-opacity=".5" stroke-dasharray="3 7"/>
+      <path class="caustic" d="M120 190 q30 -8 60 0 t60 0" stroke="#4dc3ff" stroke-opacity=".3" stroke-width="1.4" fill="none"/>
+      <path class="caustic c2" d="M470 200 q30 -8 60 0 t60 0" stroke="#4dc3ff" stroke-opacity=".3" stroke-width="1.4" fill="none"/>
       <text x="26" y="138" fill="#5e7891" font-size="11" letter-spacing="2" font-family="InterVar,sans-serif">WHAT THE MARKET SEES</text>
       <text x="26" y="172" fill="#5e7891" font-size="11" letter-spacing="2" font-family="InterVar,sans-serif">YOUR ACTUAL ORDER</text>
-      <polygon points="250,152 430,152 470,240 380,300 300,286 228,224" fill="url(#under)"/>
     </svg>
   </div>
 </header>
@@ -282,6 +397,46 @@
       <video src="iceberg-demo.mp4" autoplay muted loop playsinline controls></video>
     </div>
     <p class="player-note rv d2"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px"><path d="M4 9v6h4l6 5V4L8 9H4z" fill="currentColor" stroke="none"/><path d="M17 8a6 6 0 0 1 0 8M20 5a10 10 0 0 1 0 14"/></svg> Narrated — tap the video to unmute. Illustrative example — not live trading data. <a href="demo.html">Interactive version →</a></p>
+  </div>
+</section>
+
+<section id="venue">
+  <div class="wrap" style="text-align:center">
+    <div class="kicker rv" style="justify-content:center">Inside the venue</div>
+    <h2 class="rv" style="margin:0 auto">A batch fills up. Nobody sees inside.</h2>
+    <p class="lead rv d1" style="margin:16px auto 0">Sealed orders accumulate through the day. At auction time the whole batch crosses at one verified price.</p>
+    <div class="appwin rv d2">
+      <div class="appwin-in">
+        <div class="appbar">
+          <span class="wdot"></span><span class="wdot"></span><span class="wdot"></span>
+          <span class="url">iceberg.fund/venue</span>
+        </div>
+        <div class="appbody">
+          <div class="appside">
+            <div class="si on"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l4 5.5h-2.4L18 14H6l4.4-5.5H8z"/><path d="M4 17h16"/></svg>Auction</div>
+            <div class="si"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2.5"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>My orders</div>
+            <div class="si"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>History</div>
+          </div>
+          <div class="appmain">
+            <div class="mhead">
+              <b>Daily batch — commit window open</b>
+              <span class="phase"><span class="pd"></span>Sealed</span>
+            </div>
+            <div class="odgrid" aria-label="Sealed orders in this batch — contents hidden">
+              <div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div><div class="od"></div>
+            </div>
+            <div class="mrow"><span>Sealed orders</span><b class="mono">32</b></div>
+            <div class="mrow"><span>Sides · sizes · limits</span><b>Hidden until reveal</b></div>
+            <div class="mrow" style="display:block">
+              <span>Clearing band around market reference</span>
+              <div class="bandbar"><div class="bfill"></div><div class="btick"></div></div>
+            </div>
+            <div class="mrow"><span>Everyone clears at</span><b>One uniform price — verified on-chain</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="preview-note rv d2">Product preview — the interface is in development. The auction mechanics shown are the real protocol design.</p>
   </div>
 </section>
 
@@ -409,7 +564,7 @@
         <a href="mailto:pilot@iceberg.fund">pilot@iceberg.fund</a>
       </div>
     </div>
-    <p class="honest">Iceberg is in development and not yet live. Nothing here is investment advice, and no auction, token, or venue is currently operating. Sealed batch auctions reduce information leakage and ordering games; they do not eliminate market risk.</p>
+    <p class="honest">Iceberg is in development and not yet live. Nothing here is investment advice, and no auction, token, or venue is currently operating. Sealed batch auctions reduce information leakage and ordering games; they do not eliminate market risk. The exit simulator uses standard constant-product pool math for illustration only.</p>
   </div>
 </footer>
 
@@ -425,14 +580,45 @@
   }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
   document.querySelectorAll('.rv').forEach((el) => io.observe(el));
 
-  // gentle parallax on the iceberg (skipped for reduced motion)
+  // gentle parallax on the iceberg
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
     const berg = document.getElementById('berg');
     addEventListener('scroll', () => {
-      const y = Math.min(scrollY, 900);
-      berg.style.transform = `translateY(${y * -0.045}px)`;
+      berg.style.transform = `translateY(${Math.min(scrollY, 900) * -0.045}px)`;
     }, { passive: true });
   }
+
+  // ── exit simulator — constant-product illustration, clearly labeled ──
+  const fmt = (n) => '$' + Math.round(n).toLocaleString('en-US');
+  let size = 210000, pool = 1000000;
+  function segWire(id, set) {
+    const seg = document.getElementById(id);
+    seg.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      seg.querySelectorAll('button').forEach((x) => x.classList.remove('on'));
+      b.classList.add('on'); set(Number(b.dataset.v)); calc();
+    });
+  }
+  segWire('segSize', (v) => size = v);
+  segWire('segPool', (v) => pool = v);
+  function calc() {
+    // market sell into x*y=k: proceeds = S*Q/(Q+S), then ~1.5% sandwich skim
+    const raw = size * pool / (pool + size);
+    const mkt = raw - size * 0.015;
+    const impactPct = ((size - raw) / size * 100).toFixed(1);
+    // sealed batch: one clearing price inside the band, 0.75% fee.
+    // where it clears depends on batch demand — show the honest range.
+    const iceLo = size * 0.90 * 0.9925, iceHi = size * 0.995 * 0.9925;
+    document.getElementById('mktOut').textContent = '~' + fmt(Math.max(mkt, 0)) + ' kept';
+    document.getElementById('mktFine').textContent =
+      impactPct + '% lost to the curve alone, before the bots take their cut';
+    document.getElementById('iceOut').textContent = fmt(iceLo) + '–' + fmt(iceHi) + ' kept';
+    const gain = iceLo - Math.max(mkt, 0);
+    document.getElementById('delta').innerHTML = gain > 0
+      ? 'Even the low end of the batch range keeps <b>+' + fmt(gain) + '</b> more than the market sell.'
+      : 'At this size and depth, a market sell is competitive — Iceberg is built for orders that are big relative to the pool.';
+  }
+  calc();
 </script>
 </body>
 </html>
