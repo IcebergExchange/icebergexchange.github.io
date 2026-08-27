@@ -139,6 +139,16 @@
   .out-market .lab,.out-market .big{color:var(--coral)}
   .out-ice{background:linear-gradient(180deg,rgba(10,44,36,.4),rgba(6,18,16,.2))}
   .out-ice .lab,.out-ice .big{color:var(--mint)}
+  .brk{margin-top:10px;border-top:1px solid var(--hairline);padding-top:4px}
+  .brk .r{display:flex;justify-content:space-between;gap:10px;padding:4.5px 0;font-size:12px;color:var(--ice-dim)}
+  .brk .r b{color:var(--ice);font-weight:560}
+  .brk .r .neg{color:var(--coral)}
+  .brk .r .pos{color:var(--mint)}
+  .brk .r .zero{color:var(--ice-faint)}
+  .assume{margin-top:12px;font-size:11.5px;color:var(--ice-faint)}
+  .assume summary{cursor:pointer;font-weight:560;color:var(--ice-dim);letter-spacing:.04em}
+  .assume ul{margin:8px 0 0 16px;line-height:1.7}
+  .execok{display:none;margin-top:10px;text-align:center;font-size:12.5px;color:var(--mint);background:rgba(10,44,36,.35);border:1px solid rgba(124,232,186,.3);border-radius:10px;padding:9px 12px}
   .sim-delta{margin-top:12px;text-align:center;font-size:13px;color:var(--ice-dim)}
   .sim-delta b{color:var(--mint);font-weight:600}
 
@@ -354,11 +364,13 @@
             <div class="lab">Market sell</div>
             <div class="big mono" id="mktOut">—</div>
             <div class="fine" id="mktFine"></div>
+            <div class="brk" id="mktBrk"></div>
           </div>
           <div class="out-card out-ice">
             <div class="lab">Iceberg batch</div>
             <div class="big mono" id="iceOut">—</div>
             <div class="fine" id="iceFee"></div>
+            <div class="brk" id="iceBrk"></div>
           </div>
         </div>
         <div class="sim-delta" id="delta"></div>
@@ -369,7 +381,19 @@
           </button>
         </div>
         <a class="btn btn-primary" id="wExec" style="display:none;width:100%;justify-content:center;margin-top:14px" href="#">Seal this exit at launch</a>
+        <div class="execok" id="execOk"></div>
         <div style="text-align:center;margin-top:8px;font-size:10.5px;color:var(--ice-faint)" id="wExecNote"></div>
+        <details class="assume"><summary>Every assumption, shown</summary>
+          <ul>
+            <li>Standard constant-product pool math; the quote side is taken as half of listed liquidity.</li>
+            <li>Sandwich model: bots fill you at the slippage cap you set — your tolerance is their budget.</li>
+            <li>Iceberg clears at one uniform price inside a band around a time-weighted market reference; where inside depends on batch demand — we show 90–99.5% of reference, never a promise.</li>
+            <li>Iceberg fee: 0.75% per side, charged only on filled volume. Buyers pay the same 0.75%. Unfilled = $0 fee.</li>
+            <li>Anti-spam bond: 0.25 SOL, escrowed at commit, refunded in full on honest reveal.</li>
+            <li>If a batch doesn't cross, everyone is refunded in full — no fee, no penalty.</li>
+            <li>Projections, not quotes. The venue is in development and not yet live.</li>
+          </ul>
+        </details>
         </div>
       </div>
     </div>
@@ -627,40 +651,59 @@
     } else { S = size; Q = pool / 2; label = null; }
     if (!S || S < 100) { show('wOut', false); return; }
     show('wOut', true);
-    const imp = S / (Q + S);                      // curve impact fraction
+    const imp = S / (Q + S);
     const slipF = slip / 100;
+    const raw = S * (1 - imp);
     const mcard = document.querySelector('.out-market');
+    const row = (l, v, cls) => '<div class="r"><span>' + l + '</span><b class="mono ' + (cls || '') + '">' + v + '</b></div>';
     let mkt;
     if (imp > slipF) {
-      // impact blows through the cap -> the trade doesn't execute
       mcard.classList.add('reverted');
       $id('mktOut').textContent = 'REVERTED';
-      $id('mktFine').textContent = 'Impact ' + (imp * 100).toFixed(1) + '% > your ' + slip + '% cap — the order fails. Clip it up and wallet-watchers front-run the rest.';
+      $id('mktFine').textContent = 'The order does not execute.';
+      $id('mktBrk').innerHTML =
+        row('Position value', fmt(S)) +
+        row('Curve impact at this size', '\u2212' + (imp * 100).toFixed(1) + '%', 'neg') +
+        row('Your slippage cap', slip + '%') +
+        row('Result', 'transaction fails', 'neg') +
+        row('Then: clip it up?', 'wallet-watchers front-run the rest', 'neg');
       mkt = 0;
     } else {
-      // bots push your fill to the cap you set — tolerance is their budget
       mcard.classList.remove('reverted');
       mkt = S * (1 - slipF);
+      const botTake = raw - mkt;
       $id('mktOut').textContent = '~' + fmt(mkt) + ' kept';
-      $id('mktFine').textContent = 'Curve impact ' + (imp * 100).toFixed(1) + '% — and sandwich bots fill you at the full ' + slip + '% you allowed' + (label ? ' (from ' + label + "'s live liquidity)" : '') + '.';
+      $id('mktFine').textContent = label ? 'From ' + label + "'s live liquidity." : '';
+      $id('mktBrk').innerHTML =
+        row('Position value', fmt(S)) +
+        row('Curve impact (' + (imp * 100).toFixed(1) + '%)', '\u2212' + fmt(S - raw), 'neg') +
+        row('Bots fill you at your ' + slip + '% cap', '\u2212' + fmt(botTake), 'neg') +
+        row('You keep', fmt(mkt), 'neg');
     }
-    const feeLo = S * 0.90 * FEE, feeHi = S * 0.995 * FEE;
-    const iceLo = S * 0.90 * (1 - FEE), iceHi = S * 0.995 * (1 - FEE);
-    $id('iceOut').textContent = fmt(iceLo) + '–' + fmt(iceHi) + ' kept';
-    $id('iceFee').textContent = 'No slippage setting exists here. You set a floor; the batch clears at ONE price at or above it — or you pay nothing. Full fee: 0.75% = ' + fmt(feeLo) + '–' + fmt(feeHi) + '.';
+    const grossLo = S * 0.90, grossHi = S * 0.995;
+    const feeLo = grossLo * FEE, feeHi = grossHi * FEE;
+    const iceLo = grossLo - feeLo, iceHi = grossHi - feeHi;
+    $id('iceOut').textContent = fmt(iceLo) + '\u2013' + fmt(iceHi) + ' kept';
+    $id('iceFee').textContent = 'No slippage setting. One price at or above your floor \u2014 or you pay nothing.';
+    $id('iceBrk').innerHTML =
+      row('Position value', fmt(S)) +
+      row('Clears at one price in the band', fmt(grossLo) + '\u2013' + fmt(grossHi)) +
+      row('Iceberg fee \u2014 0.75%, fills only', '\u2212' + fmt(feeLo) + '\u2013' + fmt(feeHi), 'neg') +
+      row('Bond (0.25 SOL, refunded at reveal)', '\u00b1$0', 'zero') +
+      row("Batch doesn't cross? Full refund", '$0 cost', 'zero') +
+      row('You keep', fmt(iceLo) + '\u2013' + fmt(iceHi), 'pos');
     const gain = iceLo - mkt;
     $id('delta').innerHTML = imp > slipF
       ? 'The market sell can\u2019t even execute at this size. The sealed batch clears it at one price.'
       : (gain > 0
         ? 'Worst case, you keep <b>+' + fmt(gain) + '</b> more.'
-        : 'At this size, a market sell is competitive — Iceberg is for orders big relative to the pool.');
+        : 'At this size, a market sell is competitive \u2014 Iceberg is for orders big relative to the pool.');
     const ex = $id('wExec');
-    if (mode === 'wallet' && sel) {
-      ex.style.display = '';
-      ex.href = 'mailto:pilot@iceberg.fund?subject=' + encodeURIComponent('Launch access — sealed exit: ' + label) +
-        '&body=' + encodeURIComponent('I want to seal an exit of ~' + fmt(S) + ' of ' + label + ' when Iceberg launches on mainnet.');
-      $id('wExecNote').textContent = 'Reserves your spot for mainnet launch. Nothing moves until the venue is live — never overpromised.';
-    } else ex.style.display = 'none';
+    ex.style.display = '';
+    const what = label ? ('~' + fmt(S) + ' of ' + label) : ('~' + fmt(S) + ' of a token I hold');
+    ex.dataset.body = 'I want to seal an exit of ' + what + ' when Iceberg launches on mainnet.';
+    ex.dataset.subject = 'Launch access \u2014 sealed exit' + (label ? ': ' + label : '');
+    $id('wExecNote').textContent = 'Reserves your spot for mainnet launch. Nothing moves until the venue is live \u2014 never overpromised.';
   }
 
 
@@ -725,6 +768,17 @@
   });
 
   calc();
+
+  // submit must WORK for everyone — clipboard + visible confirmation, then mail app
+  $id('wExec').addEventListener('click', (e) => {
+    e.preventDefault();
+    const ex = e.currentTarget;
+    try { navigator.clipboard?.writeText(ex.dataset.body + ' (send to: pilot@iceberg.fund)'); } catch (_) {}
+    const ok = $id('execOk');
+    ok.style.display = 'block';
+    ok.textContent = 'Request copied to your clipboard \u2014 email it to pilot@iceberg.fund (also opening your mail app).';
+    location.href = 'mailto:pilot@iceberg.fund?subject=' + encodeURIComponent(ex.dataset.subject || 'Iceberg launch access') + '&body=' + encodeURIComponent(ex.dataset.body || '');
+  });
 </script>
 </body>
 </html>
