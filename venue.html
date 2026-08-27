@@ -16,7 +16,8 @@
   .nav-in{display:flex;align-items:center;justify-content:space-between;max-width:1000px;margin:0 auto;padding:15px 24px}
   .mark{display:flex;align-items:center;gap:10px;font-weight:640;letter-spacing:.16em;font-size:14px}
   .navlinks{display:flex;align-items:center;gap:14px}
-  .netpill{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:5px 11px;border-radius:999px;border:1px solid var(--hairline-strong);color:var(--ice-dim)}
+  .netpill{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;padding:5px 11px;border-radius:999px;border:1px solid var(--hairline-strong);color:var(--ice-dim);white-space:nowrap}
+  .netpill.preview{color:var(--ice-faint);border-color:var(--hairline-strong)}
   .netpill.main{color:var(--mint);border-color:rgba(124,232,186,.35)} .netpill.test{color:var(--amber);border-color:rgba(255,179,92,.35)}
   .btn-conn{background:linear-gradient(180deg,#6fd2ff,#2b95d8);color:#04121f;border:0;font-family:inherit;font-weight:590;font-size:13.5px;padding:9px 18px;border-radius:999px;cursor:pointer}
   .wrap{max-width:1000px;margin:0 auto;padding:26px 24px 80px}
@@ -87,6 +88,16 @@
   .linkbtn{background:none;border:0;color:var(--ice-faint);font-family:inherit;font-size:12px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
   .linkbtn:hover{color:var(--ice-dim)}
   .mech{margin-top:20px;font-size:12.5px;color:var(--ice-faint)} .mech summary{cursor:pointer;font-weight:560;color:var(--ice-dim)} .mech ol{margin:10px 0 0 16px;line-height:1.7} .mech b{color:var(--ice-dim)}
+  @media(max-width:520px){
+    .nav-in{padding:12px 15px}
+    .mark{font-size:12.5px;letter-spacing:.1em;gap:8px}
+    .mark svg{width:19px;height:19px}
+    .netpill{font-size:9.5px;padding:4px 8px}
+    .btn-conn{font-size:12.5px;padding:8px 14px}
+    .navlinks{gap:9px}
+  }
+  .orders .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:220px}
+  .orders .empty svg{opacity:.5}
 </style>
 </head>
 <body>
@@ -1537,7 +1548,7 @@
     <!-- RIGHT: your sealed orders -->
     <section class="panel">
       <div class="ph"><h2>Your sealed orders</h2><span class="ph-r"><button id="clrFin" class="linkbtn" style="display:none">Clear finished</button><span class="mini" id="ordCount">0</span></span></div>
-      <div id="orders" class="orders"><div class="empty">No sealed orders yet. Seal one on the left — it's saved to this device so you can always reveal it.</div></div>
+      <div id="orders" class="orders"><div class="empty"><svg width="40" height="40" viewBox="0 0 48 48" fill="none" aria-hidden="true"><g opacity=".9"><polygon points="24,7 33,20 28,20 37,30 24,30" fill="#3a5064"/><polygon points="24,7 15,20 20,20 11,30 24,30" fill="#4a6478"/><line x1="6" y1="30" x2="42" y2="30" stroke="#59c7ff" stroke-opacity=".4" stroke-dasharray="2 5"/><polygon points="15,31 33,31 37,42 27,46 21,45 12,38" fill="#1a4a6e" opacity=".5"/></g></svg><span>No sealed orders yet. Seal one on the left — it's saved to this device so you can always reveal it.</span></div></div>
       <details class="mech"><summary>How a batch works</summary>
         <ol>
           <li><b>Commit</b> — your order commits as a hash with funds escrowed. No one can see side, size, or price. You can cancel it any time before the commit window closes — escrow and bond come back in full.</li>
@@ -2060,7 +2071,7 @@ function renderOrders(now) {
   const finished = mine.some((o) => ['settled', 'cancelled'].includes(o.status));
   $('clrFin').style.display = finished ? '' : 'none';
   const el = $('orders');
-  if (!mine.length) { el.innerHTML = '<div class="empty">No sealed orders yet. Seal one on the left — it\'s saved to this device so you can always reveal it.</div>'; return; }
+  if (!mine.length) { el.innerHTML = '<div class="empty"><svg width="40" height="40" viewBox="0 0 48 48" fill="none" aria-hidden="true"><g opacity=".9"><polygon points="24,7 33,20 28,20 37,30 24,30" fill="#3a5064"/><polygon points="24,7 15,20 20,20 11,30 24,30" fill="#4a6478"/><line x1="6" y1="30" x2="42" y2="30" stroke="#59c7ff" stroke-opacity=".4" stroke-dasharray="2 5"/><polygon points="15,31 33,31 37,42 27,46 21,45 12,38" fill="#1a4a6e" opacity=".5"/></g></svg><span>No sealed orders yet. Seal one on the left — it\'s saved to this device so you can always reveal it.</span></div>'; return; }
   el.innerHTML = mine.map((o) => orderCard(o, now)).join('');
   el.querySelectorAll('[data-reveal]').forEach((b) => b.onclick = () => reveal(mine.find((x) => x.id === b.dataset.reveal), b));
   el.querySelectorAll('[data-settle]').forEach((b) => b.onclick = () => settle(mine.find((x) => x.id === b.dataset.settle), b));
@@ -2219,8 +2230,8 @@ function setBusy(on, _msg, label) {
   else { b.disabled = !wallet; b.textContent = 'Seal order'; refresh(); }
 }
 function cardBusy(btn, label) { if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>' + label; } }
-$('netPill').textContent = CFG.network;
-$('netPill').className = 'netpill ' + (CFG.network === 'mainnet-beta' ? 'main' : 'test');
+$('netPill').textContent = CFG.network === 'mainnet-beta' ? 'Preview' : CFG.network;
+$('netPill').className = 'netpill ' + (CFG.network === 'mainnet-beta' ? 'preview' : 'test');
 
 // ── wire up ──
 $('connect').onclick = connect;
