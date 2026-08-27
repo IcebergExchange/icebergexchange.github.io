@@ -119,6 +119,16 @@
   .seg{display:flex;background:rgba(4,10,18,.7);border:1px solid var(--hairline);border-radius:11px;padding:4px;gap:4px}
   .seg button{flex:1;border:0;background:transparent;color:var(--ice-dim);font-family:inherit;font-size:13px;font-weight:540;padding:8px 4px;border-radius:8px;cursor:pointer;transition:background .2s,color .2s}
   .seg button.on{background:linear-gradient(180deg,rgba(89,199,255,.22),rgba(89,199,255,.1));color:var(--ice)}
+  .sldrow{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+  .sldrow label{margin-bottom:0 !important}
+  .sldrow .val{font-size:15px;font-weight:630;letter-spacing:-.02em}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;background:linear-gradient(90deg,rgba(89,199,255,.5) var(--p,50%),rgba(4,10,18,.9) var(--p,50%));outline:none;border:1px solid var(--hairline)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#8fd8ff,#2b95d8);border:2px solid #04121f;box-shadow:0 2px 10px rgba(89,199,255,.5);cursor:pointer}
+  .scen{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .scen button{border:1px solid var(--hairline);background:rgba(4,10,18,.5);color:var(--ice-dim);font-family:inherit;font-size:12px;font-weight:560;padding:7px 13px;border-radius:999px;cursor:pointer;transition:all .2s}
+  .scen button:hover,.scen button.on{color:var(--ice);border-color:rgba(89,199,255,.5);background:rgba(89,199,255,.09)}
+  .out-market.reverted{background:linear-gradient(180deg,rgba(64,34,10,.4),rgba(24,14,6,.25))}
+  .out-market.reverted .lab,.out-market.reverted .big{color:#ffb35c}
   .sim-out{margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
   @media(max-width:600px){.sim-out{grid-template-columns:1fr}}
   .out-card{border-radius:14px;padding:15px 18px;border:1px solid var(--hairline)}
@@ -311,23 +321,29 @@
         </div>
 
         <div id="wManualBox">
+        <div class="scen" id="scen">
+          <button data-s="60000,400000,5">Degen bag &middot; $60k</button>
+          <button data-s="210000,1000000,5" class="on">Whale exit &middot; $210k</button>
+          <button data-s="750000,2000000,20">Heavy size &middot; $750k</button>
+          <button data-s="2000000,8000000,20">Fund unwind &middot; $2M</button>
+        </div>
         <div class="sim-controls">
           <div class="field">
-            <label>Position</label>
-            <div class="seg" id="segSize">
-              <button data-v="50000">$50k</button>
-              <button data-v="210000" class="on">$210k</button>
-              <button data-v="500000">$500k</button>
-              <button data-v="1000000">$1M</button>
-            </div>
+            <div class="sldrow"><label>Position to sell</label><span class="val mono" id="posVal">$210,000</span></div>
+            <input type="range" id="posR" min="0" max="100" value="49">
           </div>
           <div class="field">
-            <label>Pool liquidity</label>
-            <div class="seg" id="segPool">
-              <button data-v="250000">$250k</button>
-              <button data-v="1000000" class="on">$1M</button>
-              <button data-v="5000000">$5M</button>
-            </div>
+            <div class="sldrow"><label>Token pool liquidity</label><span class="val mono" id="poolVal">$1,000,000</span></div>
+            <input type="range" id="poolR" min="0" max="100" value="43">
+          </div>
+        </div>
+        <div class="field" style="margin-top:12px">
+          <label>Your slippage setting (market sell)</label>
+          <div class="seg" id="segSlip">
+            <button data-v="1">1%</button>
+            <button data-v="5" class="on">5%</button>
+            <button data-v="20">20%</button>
+            <button data-v="50">50%</button>
           </div>
         </div>
         </div>
@@ -573,32 +589,71 @@
       b.classList.add('on'); set(Number(b.dataset.v)); calc();
     });
   }
-  segWire('segSize', (v) => size = v);
-  segWire('segPool', (v) => pool = v);
   segWire('wPct', (v) => pct = v);
+  let slip = 5;
+  segWire('segSlip', (v) => slip = v);
+  // log-scale sliders: position $10k–$5M, pool $100k–$20M
+  const posOf = (x) => 10000 * Math.pow(500, x / 100);
+  const poolOf = (x) => 100000 * Math.pow(200, x / 100);
+  const xOfPos = (v) => Math.round(Math.log(v / 10000) / Math.log(500) * 100);
+  const xOfPool = (v) => Math.round(Math.log(v / 100000) / Math.log(200) * 100);
+  function sld(id, valId, ofX, set) {
+    const r = $id(id);
+    const paint = () => { r.style.setProperty('--p', r.value + '%'); };
+    r.addEventListener('input', () => { const v = ofX(Number(r.value)); set(v); $id(valId).textContent = fmt(v); paint(); calc(); });
+    paint();
+  }
+  sld('posR', 'posVal', posOf, (v) => size = v);
+  sld('poolR', 'poolVal', poolOf, (v) => pool = v);
+  $id('scen').addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    document.querySelectorAll('#scen button').forEach((x) => x.classList.remove('on'));
+    b.classList.add('on');
+    const [S, P, SL] = b.dataset.s.split(',').map(Number);
+    size = S; pool = P; slip = SL;
+    $id('posR').value = xOfPos(S); $id('poolR').value = xOfPool(P);
+    $id('posVal').textContent = fmt(S); $id('poolVal').textContent = fmt(P);
+    ['posR','poolR'].forEach((id) => $id(id).style.setProperty('--p', $id(id).value + '%'));
+    document.querySelectorAll('#segSlip button').forEach((x) => x.classList.toggle('on', Number(x.dataset.v) === SL));
+    calc();
+  });
 
   function calc() {
     let S, Q, label;
     if (mode === 'wallet' && sel) {
       S = sel.value * pct / 100;
-      Q = Math.max(sel.liq / 2, 1);            // quote side ≈ half of aggregate pool liquidity
+      Q = Math.max(sel.liq / 2, 1);
       label = sel.symbol;
     } else { S = size; Q = pool / 2; label = null; }
     if (!S || S < 100) { show('wOut', false); return; }
     show('wOut', true);
-    const raw = S * Q / (Q + S);
-    const mkt = Math.max(raw - S * 0.015, 0);
-    const impactPct = ((S - raw) / S * 100).toFixed(1);
+    const imp = S / (Q + S);                      // curve impact fraction
+    const slipF = slip / 100;
+    const mcard = document.querySelector('.out-market');
+    let mkt;
+    if (imp > slipF) {
+      // impact blows through the cap -> the trade doesn't execute
+      mcard.classList.add('reverted');
+      $id('mktOut').textContent = 'REVERTED';
+      $id('mktFine').textContent = 'Impact ' + (imp * 100).toFixed(1) + '% > your ' + slip + '% cap — the order fails. Clip it up and wallet-watchers front-run the rest.';
+      mkt = 0;
+    } else {
+      // bots push your fill to the cap you set — tolerance is their budget
+      mcard.classList.remove('reverted');
+      mkt = S * (1 - slipF);
+      $id('mktOut').textContent = '~' + fmt(mkt) + ' kept';
+      $id('mktFine').textContent = 'Curve impact ' + (imp * 100).toFixed(1) + '% — and sandwich bots fill you at the full ' + slip + '% you allowed' + (label ? ' (from ' + label + "'s live liquidity)" : '') + '.';
+    }
     const feeLo = S * 0.90 * FEE, feeHi = S * 0.995 * FEE;
     const iceLo = S * 0.90 * (1 - FEE), iceHi = S * 0.995 * (1 - FEE);
-    $id('mktOut').textContent = '~' + fmt(mkt) + ' kept';
-    $id('mktFine').textContent = impactPct + '% lost to the curve + bots' + (label ? ' (from ' + label + "'s live liquidity)" : '');
     $id('iceOut').textContent = fmt(iceLo) + '–' + fmt(iceHi) + ' kept';
-    $id('iceFee').textContent = 'One price in the band. Our full fee: 0.75% = ' + fmt(feeLo) + '–' + fmt(feeHi) + '. No spread, no MEV tax.';
+    $id('iceFee').textContent = 'No slippage setting exists here. You set a floor; the batch clears at ONE price at or above it — or you pay nothing. Full fee: 0.75% = ' + fmt(feeLo) + '–' + fmt(feeHi) + '.';
     const gain = iceLo - mkt;
-    $id('delta').innerHTML = gain > 0
-      ? 'Worst case, you keep <b>+' + fmt(gain) + '</b> more.'
-      : 'At this size, a market sell is competitive — Iceberg is for orders big relative to the pool.';
+    $id('delta').innerHTML = imp > slipF
+      ? 'The market sell can\u2019t even execute at this size. The sealed batch clears it at one price.'
+      : (gain > 0
+        ? 'Worst case, you keep <b>+' + fmt(gain) + '</b> more.'
+        : 'At this size, a market sell is competitive — Iceberg is for orders big relative to the pool.');
     const ex = $id('wExec');
     if (mode === 'wallet' && sel) {
       ex.style.display = '';
