@@ -954,6 +954,9 @@
       ],
       "accounts": [
         {
+          "name": "venue"
+        },
+        {
           "name": "market"
         },
         {
@@ -993,6 +996,11 @@
         },
         {
           "name": "insurance",
+          "docs": [
+            "so WITHOUT binding this a griefer could slash a no-show and redirect the",
+            "forfeited bond to itself. Pinning it to venue.authority makes the bond",
+            "flow only to the venue's control (recoverable), never to the slasher."
+          ],
           "writable": true
         }
       ],
@@ -1189,6 +1197,11 @@
       "code": 6016,
       "name": "MathOverflow",
       "msg": "arithmetic overflow in clearing/settlement math"
+    },
+    {
+      "code": 6017,
+      "name": "BadDestination",
+      "msg": "protocol-value destination not controlled by the venue authority"
     }
   ],
   "types": [
