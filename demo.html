@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <title>ICEBERG — demo</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='u' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%234dc3ff'/%3E%3Cstop offset='1' stop-color='%231a5f8e' stop-opacity='.3'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='5' fill='%23060b14'/%3E%3Cpolygon points='12,3 16.5,9.5 14,9.5 18.5,14.8 12,14.8' fill='%23bcd9ec'/%3E%3Cpolygon points='12,3 7.5,9.5 10,9.5 5.5,14.8 12,14.8' fill='%23ffffff'/%3E%3Cpolygon points='6.5,15.4 17.5,15.4 15,20.8 9,20.8' fill='url(%23u)'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%3E%3Cdefs%3E%3ClinearGradient%20id=%22wl%22%20x1=%220%22%20y1=%220%22%20x2=%221%22%20y2=%220%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%235fe0cf%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%23a99bff%22/%3E%3C/linearGradient%3E%3ClinearGradient%20id=%22mass%22%20x1=%220%22%20y1=%220%22%20x2=%220%22%20y2=%221%22%3E%3Cstop%20offset=%220%22%20stop-color=%22%23a99bff%22/%3E%3Cstop%20offset=%221%22%20stop-color=%22%234b3f9e%22%20stop-opacity=%22.45%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width=%2224%22%20height=%2224%22%20rx=%225%22%20fill=%22%2307080f%22/%3E%3Cg%20transform=%22translate%282.4%202.4%29%20scale%28.8%29%22%3E%3Cpolygon%20points=%2212,2.6%208.6,9%2015.4,9%22%20fill=%22%23ffffff%22/%3E%3Cpolygon%20points=%2212,2.6%2012,9%2015.4,9%22%20fill=%22%23cfd8f4%22/%3E%3Crect%20x=%222%22%20y=%229.9%22%20width=%2220%22%20height=%221.3%22%20rx=%22.65%22%20fill=%22url%28%23wl%29%22/%3E%3Cpolygon%20points=%224.6,12.6%2019.4,12.6%2018.4,15%205.6,15%22%20fill=%22url%28%23mass%29%22/%3E%3Cpolygon%20points=%226.2,16.2%2017.8,16.2%2016.9,18.4%207.1,18.4%22%20fill=%22url%28%23mass%29%22/%3E%3Cpolygon%20points=%227.8,19.6%2016.2,19.6%2015.3,21.6%208.7,21.6%22%20fill=%22url%28%23mass%29%22/%3E%3C/g%3E%3C/svg%3E">
 <style>
   :root{--deep:#060b14;--water:#0a1524;--surface:#0f1f33;--ice:#dff1fb;--dim:#9db8cc;--faint:#5f7891;
-        --glow:#4dc3ff;--red:#ff5d6c;--green:#3ddc97;--hair:rgba(160,200,235,.14)}
+        --glow:#a99bff;--red:#ff5d6c;--green:#3ddc97;--hair:rgba(160,200,235,.14)}
+  @font-face{font-family:'Instrument';src:url('fonts/InstrumentSerif-normal.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
   @font-face{font-family:'InterV';src:url('fonts/InterVariable.woff2') format('woff2');font-weight:100 900;font-style:normal}
   *{margin:0;padding:0;box-sizing:border-box}
   body{background:var(--deep);color:var(--ice);font:15px/1.5 'InterV',-apple-system,BlinkMacSystemFont,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;font-feature-settings:'cv11','ss01';letter-spacing:-.01em}
@@ -33,7 +34,7 @@
   .jup .pill-red{background:rgba(255,93,108,.14);border:1px solid rgba(255,93,108,.4);color:#ff8a97;border-radius:999px;padding:3px 10px;font-weight:700;font-size:12px}
   .jup .cta{margin-top:12px;width:100%;text-align:center;border-radius:14px;padding:14px;font-weight:800;font-size:16px}
   .cta-lime{background:#c7f284;color:#101508}
-  .cta-ice{background:linear-gradient(180deg,#5fcbff,#2a93d5);color:#04121f}
+  .cta-ice{background:linear-gradient(180deg,#5fcbff,#2a93d5);color:#0b0820}
   .cipher{font-family:'SF Mono',ui-monospace,Menlo,monospace;letter-spacing:0}
   .toast{position:absolute;display:flex;gap:10px;align-items:flex-start;background:#0d1a12;border:1px solid rgba(61,220,151,.45);border-radius:14px;padding:12px 16px;font-size:13px;color:#bfeeda;box-shadow:0 18px 44px rgba(0,0,0,.5);opacity:0}
   .toast .tick2{color:var(--green);font-size:16px;font-weight:800}
@@ -52,7 +53,7 @@
     padding:10px 22px;font-size:19px;color:var(--ice);max-width:860px}
   #disc{position:absolute;right:14px;top:12px;font-size:10.5px;letter-spacing:.14em;color:var(--faint);text-transform:uppercase;z-index:50}
   /* wordmark */
-  .wm{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.18em;font-size:20px}
+  .wm{display:flex;align-items:center;gap:12px;font-family:'Instrument',Georgia,serif;font-weight:400;letter-spacing:.22em;font-size:22px}
   /* chart */
   .chart{position:relative;background:#081120;border:1px solid var(--hair);border-radius:14px;overflow:hidden}
   .chart .hdr{display:flex;justify-content:space-between;padding:10px 14px;font-size:12px;color:var(--faint);border-bottom:1px solid var(--hair)}
@@ -65,7 +66,7 @@
   .swap .val{font-size:20px;font-weight:700;margin-top:3px}
   .impact{display:flex;justify-content:space-between;font-size:13px;margin-top:12px;padding:0 2px}
   .sellbtn{margin-top:14px;width:100%;text-align:center;background:linear-gradient(180deg,#ff6b7a,#d63b4d);border-radius:12px;padding:12px;font-weight:800;color:#fff}
-  .commitbtn{margin-top:14px;width:100%;text-align:center;background:linear-gradient(180deg,#5fcbff,#2a93d5);border-radius:12px;padding:12px;font-weight:800;color:#04121f}
+  .commitbtn{margin-top:14px;width:100%;text-align:center;background:linear-gradient(180deg,#5fcbff,#2a93d5);border-radius:12px;padding:12px;font-weight:800;color:#0b0820}
   /* receipts */
   .receipt{width:330px;padding:22px}
   .receipt .row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--hair);font-size:14px}
@@ -102,21 +103,21 @@
   .txrow .sell{color:#ff8a97;font-weight:700}
   .txrow .bot{color:#ffb35c;font-weight:700}
   /* venue window (matches iceberg.fund interface) */
-  .vwin{background:linear-gradient(180deg,#0b1728,#070f1c);border:1px solid rgba(163,199,232,.2);border-radius:18px;box-shadow:0 40px 100px rgba(0,0,0,.6);overflow:hidden}
+  .vwin{background:linear-gradient(180deg,#0b1728,#070f1c);border:1px solid rgba(176,180,232,.2);border-radius:18px;box-shadow:0 40px 100px rgba(0,0,0,.6);overflow:hidden}
   .vbar{display:flex;align-items:center;gap:7px;padding:11px 15px;border-bottom:1px solid var(--hair)}
-  .vbar .wdot{width:9px;height:9px;border-radius:50%;background:rgba(163,199,232,.16)}
+  .vbar .wdot{width:9px;height:9px;border-radius:50%;background:rgba(176,180,232,.16)}
   .vbar .url{margin-left:9px;font-size:10.5px;color:var(--faint);letter-spacing:.06em;background:rgba(4,10,18,.6);border:1px solid var(--hair);border-radius:7px;padding:3px 10px}
   .vbody{display:grid;grid-template-columns:132px 1fr}
   .vrail{border-right:1px solid var(--hair);padding:13px 9px}
   .vrail .si{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--faint);padding:8px 9px;border-radius:8px;margin-bottom:2px}
-  .vrail .si.on{background:rgba(89,199,255,.10);color:var(--ice)}
+  .vrail .si.on{background:rgba(169,155,255,.10);color:var(--ice)}
   .vmain{padding:16px 18px}
   .vhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:10px}
   .vhead b{font-size:13.5px}
   .vphase{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#7ce8ba;font-weight:700;display:inline-flex;align-items:center;gap:6px}
   .vphase .pd{width:5px;height:5px;border-radius:50%;background:#7ce8ba;box-shadow:0 0 7px rgba(124,232,186,.8)}
   .vgrid{display:grid;grid-template-columns:repeat(16,1fr);gap:4px;margin:6px 0 10px}
-  .vod{aspect-ratio:1;border-radius:3.5px;background:rgba(89,199,255,.14);border:1px solid rgba(89,199,255,.2)}
+  .vod{aspect-ratio:1;border-radius:3.5px;background:rgba(169,155,255,.14);border:1px solid rgba(169,155,255,.2)}
   .vrow{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--hair);font-size:11.5px;color:var(--dim)}
   .vrow b{color:var(--ice);font-weight:600}
   /* bars */
@@ -129,10 +130,10 @@
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<linearGradient id="bergU" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4dc3ff"/><stop offset="1" stop-color="#1a5f8e" stop-opacity=".25"/></linearGradient>
+<linearGradient id="wl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5fe0cf"/><stop offset="1" stop-color="#a99bff"/></linearGradient><linearGradient id="mass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a99bff" stop-opacity=".95"/><stop offset="1" stop-color="#4b3f9e" stop-opacity=".35"/></linearGradient>
 <filter id="bergS" x="-50%" y="-50%" width="200%" height="200%">
-<feDropShadow dx="0" dy="1.1" stdDeviation="1.1" flood-color="#04121f" flood-opacity="0.6"/>
-<feDropShadow dx="0" dy="0" stdDeviation="2.4" flood-color="#4dc3ff" flood-opacity="0.4"/>
+<feDropShadow dx="0" dy="1.1" stdDeviation="1.1" flood-color="#0b0820" flood-opacity="0.6"/>
+<feDropShadow dx="0" dy="0" stdDeviation="2.4" flood-color="#a99bff" flood-opacity="0.4"/>
 </filter></defs></svg>
 <div id="frame"><div id="capture-stage">
   <div id="disc">Real market data (Aug 27, 2026) · hypothetical order — projected impact</div>
@@ -141,7 +142,7 @@
   <div class="scene" id="s1">
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px">
       <div class="wm">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><g filter="url(#bergS)"><polygon points="12,2 17,9 14,9 19,15 12,15" fill="#bcd9ec"/><polygon points="12,2 7,9 10,9 5,15 12,15" fill="#ffffff"/><polygon points="12,5.2 14.4,9.8 12,15 9.6,9.8" fill="#e9f6fe"/><polygon points="6,15.7 18,15.7 15.2,21.8 8.8,21.8" fill="url(#bergU)" opacity=".92"/></g></svg>
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none"><g><polygon points="12,2.6 8.6,9 15.4,9" fill="#ffffff"/><polygon points="12,2.6 12,9 15.4,9" fill="#cfd8f4"/><rect x="2" y="9.9" width="20" height="1.3" rx=".65" fill="url(#wl)"/><polygon points="4.6,12.6 19.4,12.6 18.4,15 5.6,15" fill="url(#mass)"/><polygon points="6.2,16.2 17.8,16.2 16.9,18.4 7.1,18.4" fill="url(#mass)"/><polygon points="7.8,19.6 16.2,19.6 15.3,21.6 8.7,21.6" fill="url(#mass)"/></g></svg>
         ICEBERG
       </div>
       <div class="card" style="padding:26px 34px;text-align:center">
@@ -181,7 +182,7 @@
     <div class="chart" style="position:absolute;right:60px;top:76px;width:600px;height:300px">
       <div class="hdr"><span>$BREAKING / SOL · real chart, then projected</span><span class="px mono" id="s2px">$0.01000</span></div>
       <svg id="s2svg" width="600" height="258" viewBox="0 0 600 258"></svg>
-      <div class="tick" id="t-pool" style="left:16px;top:52px;background:rgba(77,195,255,.10);border:1px solid rgba(77,195,255,.4);color:#9fd8f7">real pool liquidity $315k — your order is 67% of it</div>
+      <div class="tick" id="t-pool" style="left:16px;top:52px;background:rgba(169,155,255,.10);border:1px solid rgba(169,155,255,.4);color:#9fd8f7">real pool liquidity $315k — your order is 67% of it</div>
       <div class="tick" id="t-curve" style="right:250px;top:100px;background:rgba(255,93,108,.15);border:1px solid rgba(255,93,108,.5);color:#ff9aa5">projected curve impact −$120,000</div>
       <div class="tick" id="t-mev" style="right:110px;top:170px;background:rgba(255,93,108,.15);border:1px solid rgba(255,93,108,.5);color:#ff9aa5">sandwich bots −$3,300</div>
     </div>
@@ -313,7 +314,7 @@
   <div class="scene" id="s7">
     <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px">
       <div class="wm" style="font-size:26px">
-        <svg width="44" height="44" viewBox="0 0 24 24" fill="none"><g filter="url(#bergS)"><polygon points="12,2 17,9 14,9 19,15 12,15" fill="#bcd9ec"/><polygon points="12,2 7,9 10,9 5,15 12,15" fill="#ffffff"/><polygon points="12,5.2 14.4,9.8 12,15 9.6,9.8" fill="#e9f6fe"/><polygon points="6,15.7 18,15.7 15.2,21.8 8.8,21.8" fill="url(#bergU)" opacity=".92"/></g></svg>
+        <svg width="44" height="44" viewBox="0 0 24 24" fill="none"><g><polygon points="12,2.6 8.6,9 15.4,9" fill="#ffffff"/><polygon points="12,2.6 12,9 15.4,9" fill="#cfd8f4"/><rect x="2" y="9.9" width="20" height="1.3" rx=".65" fill="url(#wl)"/><polygon points="4.6,12.6 19.4,12.6 18.4,15 5.6,15" fill="url(#mass)"/><polygon points="6.2,16.2 17.8,16.2 16.9,18.4 7.1,18.4" fill="url(#mass)"/><polygon points="7.8,19.6 16.2,19.6 15.3,21.6 8.7,21.6" fill="url(#mass)"/></g></svg>
         ICEBERG
       </div>
       <div class="big" style="text-align:center">Sell size.<br><span style="color:var(--faint)">Make no waves.</span></div>
@@ -482,7 +483,7 @@ function render(t){
     const joinP=clamp((lt-8400)/500,0,1);
     const mine=$('s4cellmine');
     if(mine){mine.style.opacity=joinP;
-      mine.style.boxShadow=joinP>0?`0 0 ${10*joinP}px rgba(77,195,255,.8)`:'none';}
+      mine.style.boxShadow=joinP>0?`0 0 ${10*joinP}px rgba(169,155,255,.8)`:'none';}
     $('s4mine').style.opacity=joinP;
   }
   // S5
@@ -528,7 +529,7 @@ function render(t){
   const g=document.getElementById('s4grid'); if(!g) return;
   let html='';
   for(let i=0;i<31;i++) html+=`<div class="vod" style="opacity:${.45+((i*7)%10)/18}"></div>`;
-  html+='<div class="vod" id="s4cellmine" style="opacity:0;background:rgba(77,195,255,.5);border-color:#4dc3ff"></div>';
+  html+='<div class="vod" id="s4cellmine" style="opacity:0;background:rgba(169,155,255,.5);border-color:#a99bff"></div>';
   g.innerHTML=html;
 })();
 
