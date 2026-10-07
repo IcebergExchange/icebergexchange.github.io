@@ -80,6 +80,21 @@
     transition:transform .18s var(--ease),box-shadow .18s;
   }
   .side-cta:hover{transform:translateY(-1px);box-shadow:0 1px 0 rgba(255,255,255,.45) inset,0 12px 34px rgba(169,155,255,.35)}
+  /* $ICEBERG token area */
+  .side-token{margin-top:14px;border-radius:14px;padding:1px;background:linear-gradient(160deg,rgba(95,224,207,.45),rgba(169,155,255,.12) 45%,rgba(169,155,255,.4))}
+  .side-token-in{border-radius:13px;background:rgba(6,9,18,.92);padding:12px 13px 13px}
+  .side-token-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .side-token-tag{font-family:"Instrument",Georgia,serif;font-size:15.5px;letter-spacing:.14em;color:var(--ice)}
+  .side-token-state{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ice-faint);white-space:nowrap}
+  .side-token-state.live{color:var(--aurora)}
+  .side-token-ca{display:block;margin-top:9px;font-family:"SF Mono",ui-monospace,Menlo,monospace;font-size:11px;color:var(--ice-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:default}
+  .side-token-ca.live{color:var(--ice);cursor:pointer}
+  .side-token-ca.live:hover{color:var(--glow)}
+  .side-token-btn{margin-top:10px;display:flex;justify-content:center;text-decoration:none;font-size:12.5px;font-weight:590;color:#0b0820;padding:9px 12px;border-radius:10px;background:linear-gradient(180deg,#c3b9ff,#7a66f0);transition:transform .18s var(--ease)}
+  .side-token-btn:hover{transform:translateY(-1px)}
+  .side-token-btn[aria-disabled="true"]{opacity:.45;pointer-events:none}
+  .topbar .top-token{display:inline-flex;align-items:center;gap:6px;margin-left:auto;margin-right:10px;text-decoration:none;font-size:11.5px;font-weight:600;letter-spacing:.06em;color:var(--ice-dim);border:1px solid var(--hairline-strong);border-radius:999px;padding:7px 11px}
+  .topbar .top-token[aria-disabled="true"]{opacity:.55;pointer-events:none}
   .side-foot{margin-top:auto;display:flex;flex-direction:column;gap:9px;padding:0 12px;font-size:12.5px;color:var(--ice-faint)}
   .side-foot a{display:flex;align-items:center;gap:8px;text-decoration:none;transition:color .2s}
   .side-foot a:hover{color:var(--ice)}
@@ -328,6 +343,13 @@
       Who it's for</a>
   </div>
   <a class="side-cta" href="venue.html">See the venue</a>
+  <div class="side-token" id="icebergToken">
+    <div class="side-token-in">
+      <div class="side-token-head"><span class="side-token-tag">$ICEBERG</span><span class="side-token-state" id="icebergState">soon</span></div>
+      <code class="side-token-ca" id="icebergCA" title="Contract address">CA drops here</code>
+      <a class="side-token-btn" id="icebergBuy" href="#" aria-disabled="true" tabindex="-1">Buy $ICEBERG</a>
+    </div>
+  </div>
   <div class="side-foot">
     <a href="https://github.com/IcebergExchange" target="_blank" rel="noopener noreferrer"><svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>github.com/IcebergExchange</a>
     <a href="mailto:pilot@iceberg.fund"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M3.5 7l8.5 6 8.5-6"/></svg>pilot@iceberg.fund</a>
@@ -342,6 +364,7 @@
     </svg>
     ICEBERG
   </a>
+  <a class="top-token" id="icebergTop" href="#" aria-disabled="true">$ICEBERG</a>
   <a class="side-cta" href="venue.html">See the venue</a>
 </div>
 
@@ -642,6 +665,17 @@
 </main>
 
 <script>
+  /* $ICEBERG — set by the operator's link after on-chain verification; null = launching soon */
+  const ICEBERG_MINT = null;
+  (function(){
+    const ca=document.getElementById('icebergCA'), st=document.getElementById('icebergState'), buy=document.getElementById('icebergBuy'), top=document.getElementById('icebergTop');
+    if(!ICEBERG_MINT) return;
+    const url='https://pump.fun/coin/'+ICEBERG_MINT;
+    ca.textContent=ICEBERG_MINT; ca.classList.add('live'); ca.title='Tap to copy';
+    st.textContent='live'; st.classList.add('live');
+    for(const a of [buy,top]){ a.href=url; a.target='_blank'; a.rel='noopener noreferrer'; a.removeAttribute('aria-disabled'); a.removeAttribute('tabindex'); }
+    ca.addEventListener('click',async()=>{ try{ await navigator.clipboard.writeText(ICEBERG_MINT); }catch(e){ const t=document.createElement('textarea'); t.value=ICEBERG_MINT; document.body.appendChild(t); t.select(); try{document.execCommand('copy')}catch(_){} t.remove(); } const was=st.textContent; st.textContent='copied'; setTimeout(()=>{st.textContent=was},1400); });
+  })();
   // scroll reveals
   const io = new IntersectionObserver((es) => {
     for (const e of es) if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); }
